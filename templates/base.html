@@ -1,0 +1,213 @@
+{% load static events_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IFT-MCARS{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Base Styles -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Typography Improvements -->
+    <link href="{% static 'css/fonts.css' %}" rel="stylesheet">
+    <!-- Theme CSS -->
+    {% if request.theme == 'light' %}
+    <link id="theme-css" href="{% static 'css/light-theme.css' %}" rel="stylesheet">
+    {% else %}
+    <link id="theme-css" href="{% static 'css/dark-theme.css' %}" rel="stylesheet">
+    {% endif %}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg {% if request.theme == 'light' %}navbar-light bg-light{% else %}navbar-dark bg-dark{% endif %}">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'members:home' %}">IFT-MCARS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'members:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'members:about' %}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'members:membership_plans' %}">Membership Plans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'members:contact' %}">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'members:faq' %}">FAQ</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <button id="theme-toggle" class="btn nav-link">
+                            {% if request.theme == 'dark' %}
+                            <i class="fas fa-sun me-1"></i> Light Mode
+                            {% else %}
+                            <i class="fas fa-moon me-1"></i> Dark Mode
+                            {% endif %}
+                        </button>
+                    </li>
+                    <!-- Member Services dropdown (visible only when logged in) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Member Services
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'units:unit_org_chart' %}">
+                                    <i class="fas fa-sitemap me-2"></i> Organizational Chart
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'members:public_member_list' %}">
+                                    <i class="fas fa-users me-2"></i> Public Member List
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'events:public_calendar' %}">
+                                    <i class="fas fa-calendar-alt me-2"></i> Calendar
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- User account dropdown -->
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                {{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                {% if user.is_staff or user.groups.all.0.name == 'Member Manager' %}
+                                    <li><a class="dropdown-item" href="{% url 'members:manager_dashboard' %}">Manager Dashboard</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                {% if user.is_staff or user.groups.all.0.name == 'rank_manager' %}
+                                    <li><a class="dropdown-item" href="{% url 'rank:dashboard' %}">Rank Manager Dashboard</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                {% if user.is_staff or user.is_superuser or user.groups.all.0.name == 'unit_manager' or user.groups.all.0.name == 'rank_manager' %}
+                                    <li><a class="dropdown-item" href="{% url 'units:unit_list' %}">Unit Management</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                {% if user.is_staff or user.is_superuser %}
+                                    <li><a class="dropdown-item" href="{% url 'settings:dashboard' %}"><i class="fas fa-sliders-h me-1"></i> Settings Dashboard</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                {% events_manage_eligible as can_events_manage %}
+                                {% if can_events_manage %}
+                                    <li><a class="dropdown-item" href="{% url 'events:calendar' %}"><i class="fas fa-calendar-alt me-1"></i> Events Dashboard</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'members:member_dashboard' %}">My Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'members:member_profile' %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'members:member_settings' %}">My Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'members:logout' %}">Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <li class="nav-item">
+                            <button id="guest-theme-toggle" class="btn nav-link">
+                                {% if request.theme == 'dark' %}
+                                <i class="fas fa-sun me-1"></i> Light Mode
+                                {% else %}
+                                <i class="fas fa-moon me-1"></i> Dark Mode
+                                {% endif %}
+                            </button>
+                        </li>
+                        <a href="{% url 'login' %}" class="btn {% if request.theme == 'light' %}btn-outline-dark{% else %}btn-outline-light{% endif %} me-2">Login</a>
+                        <a href="{% url 'members:register' %}" class="btn btn-warning">Join Now</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>About Us</h5>
+                    <p class="text-muted">We provide premium membership services to our community with exclusive benefits and opportunities.</p>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5>Links</h5>
+                    <ul>
+                        <li><a href="{% url 'members:home' %}">Home</a></li>
+                        <li><a href="{% url 'members:about' %}">About</a></li>
+                        <li><a href="{% url 'members:membership_plans' %}">Plans</a></li>
+                        <li><a href="{% url 'members:contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5>Legal</h5>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Club Street, City, State</li>
+                        <li><i class="fas fa-phone me-2"></i> (123) 456-7890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@ift-mcars.com</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <div class="container">
+                <p class="mb-0">&copy; {% now "Y" %} IFT-MCARS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme Toggle Scripts -->
+    <script src="{% static 'js/theme-guest.js' %}"></script>
+    {% if user.is_authenticated %}
+    <script src="{% static 'js/theme-toggle.js' %}"></script>
+    {% endif %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

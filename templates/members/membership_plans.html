@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}IFT-MCARS{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="bg-primary py-5 text-white">
+    <div class="container text-center">
+        <h1 class="fw-bold">Membership Plans</h1>
+        <p class="lead">Choose the perfect membership plan for your needs</p>
+    </div>
+</section>
+
+<!-- Plans Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-3">Compare Our Membership Options</h2>
+                <p>We offer a variety of membership plans to suit different needs and budgets. Whether you're looking for an individual plan or family coverage, we have options for you.</p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            {% for membership_type in membership_types %}
+            <div class="col-lg-3 col-md-6">
+                <div class="plan-card plan-{{ membership_type.billing_frequency }} h-100">
+                    {% if membership_type.is_family %}
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-danger">Most Popular</span>
+                    </div>
+                    {% endif %}
+                    <div class="plan-header">
+                        <h3>{{ membership_type.name }}</h3>
+                        <div class="plan-price">
+                            {% if membership_type.billing_frequency == 'free' %}
+                                $0
+                            {% else %}
+                                ${{ membership_type.price|floatformat:0 }}
+                            {% endif %}
+                        </div>
+                        <div class="plan-duration">
+                            {% if membership_type.billing_frequency == 'monthly' %}
+                                per month
+                            {% elif membership_type.billing_frequency == 'yearly' %}
+                                per year
+                            {% elif membership_type.billing_frequency == 'lifetime' %}
+                                one-time payment
+                            {% else %}
+                                for one year
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <ul>
+                            <li><i class="fas fa-check me-2 text-success"></i> {{ membership_type.description|truncatewords:10 }}</li>
+                            <li><i class="fas fa-check me-2 text-success"></i> Member portal access</li>
+                            {% if membership_type.is_family %}
+                                <li><i class="fas fa-check me-2 text-success"></i> Add multiple children</li>
+                                <li><i class="fas fa-check me-2 text-success"></i> Family-oriented events</li>
+                            {% else %}
+                                <li><i class="fas fa-times me-2 text-danger"></i> Family additions</li>
+                            {% endif %}
+                            {% if membership_type.billing_frequency == 'free' %}
+                                <li><i class="fas fa-times me-2 text-danger"></i> Premium benefits</li>
+                                <li><i class="fas fa-times me-2 text-danger"></i> VIP events</li>
+                            {% else %}
+                                <li><i class="fas fa-check me-2 text-success"></i> Premium benefits</li>
+                                {% if membership_type.billing_frequency == 'lifetime' or membership_type.is_family %}
+                                    <li><i class="fas fa-check me-2 text-success"></i> VIP events</li>
+                                {% else %}
+                                    <li><i class="fas fa-times me-2 text-danger"></i> VIP events</li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="plan-footer">
+                        <a href="{% url 'members:register' %}?plan={{ membership_type.id }}" class="btn 
+                            {% if membership_type.billing_frequency == 'free' %}
+                                btn-primary
+                            {% elif membership_type.is_family %}
+                                btn-warning
+                            {% elif membership_type.billing_frequency == 'monthly' %}
+                                btn-danger
+                            {% else %}
+                                btn-primary
+                            {% endif %}
+                        ">
+                            {% if membership_type.billing_frequency == 'free' %}
+                                Join Free
+                            {% else %}
+                                Select Plan
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p>No membership plans available at the moment. Please check back later.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Plan Features Comparison -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Detailed Feature Comparison</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th>Feature</th>
+                                {% for membership_type in membership_types %}
+                                <th class="text-center">{{ membership_type.name }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Duration</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center">
+                                    {% if membership_type.billing_frequency == 'free' %}
+                                        1 Year
+                                    {% elif membership_type.billing_frequency == 'monthly' %}
+                                        Monthly Renewal
+                                    {% elif membership_type.billing_frequency == 'yearly' %}
+                                        Yearly Renewal
+                                    {% elif membership_type.billing_frequency == 'lifetime' %}
+                                        Lifetime
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>Member Portal</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>Add Children</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center">
+                                    {% if membership_type.is_family %}
+                                    <i class="fas fa-check text-success"></i>
+                                    {% else %}
+                                    <i class="fas fa-times text-danger"></i>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>Member Events</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center">
+                                    {% if membership_type.billing_frequency == 'free' %}
+                                        Basic Events
+                                    {% elif membership_type.is_family %}
+                                        All Events + Family
+                                    {% elif membership_type.billing_frequency == 'lifetime' %}
+                                        All Events + VIP
+                                    {% else %}
+                                        All Events
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>Support</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center">
+                                    {% if membership_type.billing_frequency == 'free' %}
+                                        Email
+                                    {% elif membership_type.is_family %}
+                                        Priority Support
+                                    {% elif membership_type.billing_frequency == 'lifetime' %}
+                                        VIP Support
+                                    {% else %}
+                                        Email & Phone
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>Pricing</td>
+                                {% for membership_type in membership_types %}
+                                <td class="text-center">
+                                    {% if membership_type.billing_frequency == 'free' %}
+                                        $0
+                                    {% elif membership_type.billing_frequency == 'monthly' %}
+                                        ${{ membership_type.price|floatformat:0 }}/month
+                                    {% elif membership_type.billing_frequency == 'yearly' %}
+                                        ${{ membership_type.price|floatformat:0 }}/year
+                                    {% elif membership_type.billing_frequency == 'lifetime' %}
+                                        ${{ membership_type.price|floatformat:0 }} once
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold">Frequently Asked Questions</h2>
+                <p class="lead">Find answers to common questions about our membership plans</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <!-- Question 1 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne">
+                                Can I upgrade my membership plan later?
+                            </button>
+                        </h3>
+                        <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, you can upgrade your membership plan at any time. When you upgrade, you'll be charged the prorated difference for the remaining time on your current billing cycle.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo">
+                                How many children can I add to a Family membership?
+                            </button>
+                        </h3>
+                        <div id="faqTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our Family membership allows you to add all of your children to your membership. There is no limit to the number of children you can include.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree">
+                                What happens after my free trial expires?
+                            </button>
+                        </h3>
+                        <div id="faqThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                After your free trial expires, you'll need to upgrade to a paid plan to continue enjoying membership benefits. You'll receive email reminders before your trial ends so you can make a decision.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour">
+                                Is the Lifetime membership really for life?
+                            </button>
+                        </h3>
+                        <div id="faqFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, the Lifetime membership provides permanent access to membership benefits for the lifetime of the member. It's a one-time payment with no recurring fees.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-warning">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="fw-bold text-dark mb-3">Ready to Join Our Community?</h2>
+                <p class="lead text-dark mb-4">Select a plan that fits your needs and become a member today!</p>
+                <a href="{% url 'members:register' %}" class="btn btn-primary btn-lg">Join Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

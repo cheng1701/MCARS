@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Membership{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'members:manager_dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'members:pending_approvals' %}">Pending Approvals</a></li>
+                        <li class="breadcrumb-item active">Reject Member</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">Reject Membership Application</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-2 text-center">
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                                    <span class="text-white fw-bold fs-3">{{ member.user.first_name|first }}{{ member.user.last_name|first }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                                <p class="mb-1"><strong>Email:</strong> {{ member.user.email }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ member.phone_number }}</p>
+                                <p class="mb-1"><strong>Membership Type:</strong> {{ member.membership_type.name }}</p>
+                                <p class="mb-1"><strong>Applied On:</strong> {{ member.member_since|date:"F j, Y" }}</p>
+                            </div>
+                        </div>
+
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="rejection_reason" class="form-label">Reason for Rejection (Optional)</label>
+                                <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" placeholder="Provide a reason for rejecting this application"></textarea>
+                                <div class="form-text">This information will be included in the notification email sent to the applicant.</div>
+                            </div>
+
+                            <div class="alert alert-danger">
+                                <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Rejecting this membership will:</p>
+                                <ul class="mb-0 mt-2">
+                                    <li>Change the member's status to "Rejected"</li>
+                                    <li>Send a rejection notification email to the applicant</li>
+                                    <li>The applicant will not be able to access member features</li>
+                                    <li>This action can be reversed later if needed</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'members:pending_approvals' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-times me-2"></i> Reject Application
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning">
+                        <h4 class="mb-0 text-dark">Application Notes</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Please ensure you have thoroughly reviewed the application before rejecting it. Common reasons for rejection include:</p>
+                        <ul>
+                            <li>Incomplete or inaccurate information</li>
+                            <li>Duplicate application</li>
+                            <li>Applicant does not meet membership criteria</li>
+                            <li>Suspected fraudulent application</li>
+                        </ul>
+                        <p class="mb-0">If the issue can be resolved, consider contacting the applicant before rejection.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

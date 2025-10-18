@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ theme.name }} Theme{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                {% include 'rank/rank_navigation.html' with active_menu='theme_list' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ theme.name }} Theme</h4>
+                        <a href="{% url 'rank:theme_edit' theme.id %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-edit me-1"></i> Edit Theme
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Theme Details</h5>
+                                <table class="table">
+                                    <tr>
+                                        <th>Name:</th>
+                                        <td>{{ theme.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>{{ theme.description|default:"No description provided" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Genre:</th>
+                                        <td>{{ theme.genre.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Branch:</th>
+                                        <td>{{ theme.branch.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status:</th>
+                                        <td>
+                                            <span class="badge {% if theme.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ theme.is_active|yesno:"Active,Inactive" }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Created:</th>
+                                        <td>{{ theme.created_at|date:"F j, Y" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Theme Coverage</h5>
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h2 class="display-4">{{ rank_images.count }}</h2>
+                                        <p class="lead">Ranks with images</p>
+
+                                        {% if missing_ranks %}
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            {{ missing_ranks.count }} ranks missing images
+                                        </div>
+                                        {% else %}
+                                        <div class="alert alert-success">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Complete coverage
+                                        </div>
+                                        {% endif %}
+
+                                        {% if missing_ranks %}
+                                        <a href="{% url 'rank:rank_image_create' theme.id %}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i> Add Missing Rank Images
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">Rank Images</h5>
+                        {% if rank_images %}
+                        <div class="row">
+                            {% for rank_image in rank_images %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <img src="{{ rank_image.image.url }}" class="card-img-top" alt="{{ rank_image.rank.short_name }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ rank_image.rank.paygrade }}</h5>
+                                        <p class="card-text">{{ rank_image.rank.short_name }}</p>
+                                        <p class="small text-muted">{{ rank_image.rank.long_name }}</p>
+                                    </div>
+                                    <div class="card-footer bg-transparent d-flex justify-content-between">
+                                        <a href="{% url 'rank:rank_image_edit' rank_image.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'rank:rank_image_delete' rank_image.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <p>No rank images have been added to this theme yet.</p>
+                        </div>
+                        <a href="{% url 'rank:rank_image_create' theme.id %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Add Rank Image
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if missing_ranks %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">Missing Rank Images</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>The following ranks do not have images in this theme:</p>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Paygrade</th>
+                                        <th>Short Name</th>
+                                        <th>Long Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rank in missing_ranks %}
+                                    <tr>
+                                        <td>{{ rank.paygrade }}</td>
+                                        <td>{{ rank.short_name }}</td>
+                                        <td>{{ rank.long_name }}</td>
+                                        <td>
+                                            <a href="{% url 'rank:rank_image_create' theme.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-plus"></i> Add Image
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Rank Management Dashboard{% endblock %}
+
+{% block extra_css %}
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Rank Management Dashboard</h1>
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4 mb-lg-0">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Rank Manager Menu</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'rank:dashboard' %}" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+
+                    <!-- Rank Items Section -->
+                    <div class="list-group-item list-group-item-secondary">
+                        <strong><i class="bi bi-diagram-3 me-2"></i> Rank Items</strong>
+                    </div>
+                    <a href="{% url 'rank:rank_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-award me-2"></i> Ranks
+                    </a>
+                    <a href="{% url 'rank:branch_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-diagram-2 me-2"></i> Branches
+                    </a>
+                    <a href="{% url 'rank:genre_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-collection me-2"></i> Genres
+                    </a>
+                    <a href="{% url 'rank:theme_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-palette me-2"></i> Themes
+                    </a>
+
+                    <!-- Configuration Section -->
+                    <div class="list-group-item list-group-item-secondary">
+                        <strong><i class="bi bi-gear me-2"></i> Configuration</strong>
+                    </div>
+                    <a href="{% url 'rank:settings_edit' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-sliders me-2"></i> Rank Default Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Ranks</h5>
+                    <h1>{{ rank_count }}</h1>
+                    <a href="{% url 'rank:rank_list' %}" class="btn btn-outline-light btn-sm">Manage</a>
+                </div>
+            </div>
+        </div>
+                    <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Themes</h5>
+                    <h1>{{ theme_count }}</h1>
+                    <a href="{% url 'rank:theme_list' %}" class="btn btn-outline-light btn-sm">Manage</a>
+                </div>
+            </div>
+        </div>
+                    <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Branches</h5>
+                    <h1>{{ branch_count }}</h1>
+                    <a href="{% url 'rank:branch_list' %}" class="btn btn-outline-light btn-sm">Manage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <a href="{% url 'rank:rank_create' %}" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-plus-circle me-2"></i>New Rank
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'rank:branch_create' %}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-plus-circle me-2"></i>New Branch
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'rank:genre_create' %}" class="btn btn-outline-warning w-100">
+                                <i class="bi bi-plus-circle me-2"></i>New Genre
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{% url 'rank:theme_create' %}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-plus-circle me-2"></i>New Theme
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Theme Coverage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Theme</th>
+                                    <th>Ranks</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for theme in themes_with_stats %}
+                                <tr>
+                                    <td>{{ theme.name }}</td>
+                                    <td>{{ theme.rank_count }}</td>
+                                    <td>
+                                        <a href="{% url 'rank:theme_detail' pk=theme.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No themes available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Ranks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Paygrade</th>
+                                    <th>Name</th>
+                                    <th>Added</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rank in recent_ranks %}
+                                <tr>
+                                    <td>{{ rank.paygrade }}</td>
+                                    <td>{{ rank.short_name }}</td>
+                                    <td>{{ rank.created_at|date }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No ranks available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

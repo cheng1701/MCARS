@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration Successful{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success fa-4x"></i>
+                </div>
+                <h1 class="fw-bold mb-4">Registration Successful!</h1>
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">Application Pending Approval</h4>
+                    <p>Your membership application has been received and is pending approval by our member manager team.</p>
+                </div>
+                <p class="lead mb-4">Thank you for applying to join our membership club. We're excited to have you as part of our community!</p>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">What happens next?</h3>
+                        <ol class="text-start">
+                            <li class="mb-2">Our member manager team will review your application.</li>
+                            <li class="mb-2">You'll receive an email notification once your application is approved.</li>
+                            <li class="mb-2">After approval, you'll be able to access your member dashboard and complete any payment requirements.</li>
+                            <li class="mb-2">Start enjoying your membership benefits!</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'members:home' %}" class="btn btn-primary btn-lg me-2">Return to Home</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

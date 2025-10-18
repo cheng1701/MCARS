@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Rank Manager Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'rank:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+
+                        <!-- Rank Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-medal me-2"></i> Rank Management</strong>
+                        </div>
+                        <a href="{% url 'rank:rank_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-list me-2"></i> All Ranks
+                        </a>
+                        <a href="{% url 'rank:rank_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus me-2"></i> Add New Rank
+                        </a>
+
+                        <!-- Theme Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-palette me-2"></i> Theme Management</strong>
+                        </div>
+                        <a href="{% url 'rank:theme_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-images me-2"></i> All Themes
+                        </a>
+                        <a href="{% url 'rank:theme_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle me-2"></i> Create Theme
+                        </a>
+
+                        <!-- Configuration Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-cogs me-2"></i> Configuration</strong>
+                        </div>
+                        <a href="{% url 'rank:genre_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tags me-2"></i> Manage Genres
+                        </a>
+                        <a href="{% url 'rank:branch_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-code-branch me-2"></i> Manage Branches
+                        </a>
+                        <a href="{% url 'rank:settings_edit' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-sliders-h me-2"></i> Default Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ title }}</h4>
+                        {% if user.is_authenticated %}
+                        {% if user.is_staff or user.is_superuser or user.groups.all.0.name == 'member_manager' or user.groups.all.0.name == 'Member Manager' %}
+                        <a href="{% url 'settings:dashboard' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-sliders-h me-1"></i> Settings Dashboard
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> This is the rank new members will be automatically assigned.
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.default_paygrade.id_for_label }}" class="form-label">Default Rank (Paygrade)</label>
+                                {{ form.default_paygrade }}
+                                {% if form.default_paygrade.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.default_paygrade.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.default_theme.id_for_label }}" class="form-label">Default Theme</label>
+                                {{ form.default_theme }}
+                                {% if form.default_theme.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.default_theme.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'rank:dashboard' %}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

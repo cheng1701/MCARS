@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Department - {{ department.name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_detail' unit.pk %}">{{ unit.get_display_name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'units:manage_departments' unit.pk %}">Departments</a></li>
+        <li class="breadcrumb-item active">{{ department.name }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-1">Manage Department</h3>
+        <p class="text-muted mb-0">Unit: {{ unit.get_display_name }} &middot; Department: {{ department.name }}</p>
+      </div>
+      <div>
+        <a href="{% url 'units:manage_departments' unit.pk %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Back to Departments
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Department Details</h5>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="update_department" value="1">
+              <div class="mb-3">
+                <label class="form-label" for="id_name">Name</label>
+                {{ form.name }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_order">Order</label>
+                  {{ form.order }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_leader">Leader</label>
+                  {{ form.leader }}
+                </div>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Department Staff</h5>
+          </div>
+          <div class="card-body">
+            <form class="mb-3" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="add_staff" value="1">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-8">
+                  <label class="form-label" for="id_member">Add Member</label>
+                  {{ staff_form.member }}
+                </div>
+                <div class="col-md-4 text-end">
+                  <button type="submit" class="btn btn-success mt-4">Add to Department</button>
+                </div>
+              </div>
+            </form>
+
+            {% if memberships %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Member</th>
+                    <th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for m in memberships %}
+                  <tr>
+                    <td>
+                      {% if m.member.profile_image %}
+                        <img src="{{ m.member.profile_image.url }}" alt="{{ m.member.user.get_full_name }}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                      {% endif %}
+                      <a href="{% url 'members:member_detail' m.member.id %}" class="text-primary fw-bold text-decoration-none">{{ m.member.get_ranked_name|default:m.member.user.get_full_name }}</a>
+                      {% if department.leader_id == m.member.id %}
+                      <span class="badge bg-warning text-dark ms-2">Leader</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ m.joined_date|date:'M d, Y' }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <div class="alert alert-info mb-0">No staff assigned to this department yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

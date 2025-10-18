@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Member Directory{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'members:home' %}">Home</a></li>
+        <li class="breadcrumb-item active">Member Directory</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">Member Directory</h1>
+      <div>
+        <a href="{% url 'units:unit_org_chart' %}" class="btn btn-outline-secondary"><i class="fas fa-sitemap me-1"></i> Org Chart</a>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <form class="row g-3 align-items-end" method="get">
+          <div class="col-md-6">
+            <label class="form-label" for="q">Search</label>
+            <input type="text" id="q" name="q" class="form-control" placeholder="Name or email" value="{{ query }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="state">State</label>
+            <select id="state" name="state" class="form-select">
+              <option value="">All</option>
+              {% for s in states %}
+              <option value="{{ s }}" {% if state_filter == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="unit">Unit</label>
+            <select id="unit" name="unit" class="form-select">
+              <option value="">All</option>
+              {% for u in units %}
+              <option value="{{ u.id }}" {% if unit_filter|add:'' == u.id|add:'' %}selected{% endif %}>{{ u.get_display_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-search me-1"></i> Apply Filters</button>
+            {% if query or state_filter or unit_filter %}
+            <a class="btn btn-outline-secondary ms-1" href="{% url 'members:public_member_list' %}"><i class="fas fa-times"></i></a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if page_obj and page_obj.object_list %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle" id="member-table">
+            <thead class="table-light">
+              <tr>
+                <th data-sort="name" class="sortable">Name</th>
+                <th data-sort="rank" class="sortable">Rank</th>
+                <th>Units</th>
+                <th data-sort="since" class="sortable">Member Since</th>
+                <th data-sort="email" class="sortable">Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in page_obj %}
+              <tr>
+                <td data-name="{{ m.user.last_name }} {{ m.user.first_name }}">
+                  <div class="d-flex align-items-center">
+                    {% if m.profile_image %}
+                      <a href="{% url 'members:public_member_detail' m.id %}">
+                        <img src="{{ m.profile_image.url }}" alt="{{ m.user.get_full_name }}" class="rounded-circle me-2" style="width:36px;height:36px;object-fit:cover;">
+                      </a>
+                    {% endif %}
+                    <div>
+                      <div class="fw-semibold"><a href="{% url 'members:public_member_detail' m.id %}" class="text-decoration-none">{{ m.get_ranked_name|default:m.user.get_full_name }}</a></div>
+                      {% if m.address %}
+                        {% if m.address.city or m.address.state %}
+                        <div class="text-muted small">{{ m.address.city }}{% if m.address.state %}, {{ m.address.state }}{% endif %}</div>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td data-rank="{% if m.rank_association %}{{ m.rank_association.rank.short_name }}{% else %}zzz{% endif %}">
+                  {% if m.rank_association %}
+                    {{ m.rank_association.rank.short_name }}
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% with memberships=m.unit_memberships.all %}
+                    {% if memberships %}
+                      {% for mem in memberships %}
+                        {% if mem.is_active %}
+                          <a href="{% url 'units:unit_public' mem.unit.id %}" class="text-decoration-none">{{ mem.unit.get_display_name }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    {% else %}
+                      <span class="text-muted">—</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td data-since="{{ m.member_since|date:'Y-m-d' }}">{{ m.member_since|date:'M d, Y' }}</td>
+                <td data-email="{{ m.user.email }}">
+                  {% if m.user.email %}
+                    <a href="mailto:{{ m.user.email }}">{{ m.user.email }}</a>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-3">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?q={{ query }}&state={{ state_filter }}&unit={{ unit_filter }}&page=1">First</a></li>
+            <li class="page-item"><a class="page-link" href="?q={{ query }}&state={{ state_filter }}&unit={{ unit_filter }}&page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?q={{ query }}&state={{ state_filter }}&unit={{ unit_filter }}&page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?q={{ query }}&state={{ state_filter }}&unit={{ unit_filter }}&page={{ page_obj.paginator.num_pages }}">Last</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-users fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No members found</h5>
+          {% if query or state_filter or unit_filter %}
+          <p class="text-muted">Try clearing filters</p>
+          <a href="{% url 'members:public_member_list' %}" class="btn btn-primary">Reset</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  // Simple client-side sorting by header clicks within current page
+  const table = document.getElementById('member-table');
+  if (!table) return;
+  const tbody = table.querySelector('tbody');
+  let currentSort = { key: null, dir: 1 };
+
+  function compare(a, b) {
+    if (a === b) return 0;
+    return a > b ? 1 : -1;
+  }
+
+  function sortBy(key) {
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.sort((r1, r2) => {
+      const v1 = (r1.querySelector(`[data-${key}]`)?.dataset[key] || '').toLowerCase();
+      const v2 = (r2.querySelector(`[data-${key}]`)?.dataset[key] || '').toLowerCase();
+      return currentSort.dir * compare(v1, v2);
+    });
+    // Re-append
+    rows.forEach(r => tbody.appendChild(r));
+  }
+
+  table.querySelectorAll('th.sortable').forEach(th => {
+    th.style.cursor = 'pointer';
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if (currentSort.key === key) {
+        currentSort.dir = -currentSort.dir;
+      } else {
+        currentSort.key = key;
+        currentSort.dir = 1;
+      }
+      // Update header indicators
+      table.querySelectorAll('th.sortable').forEach(h => h.classList.remove('text-primary'));
+      th.classList.add('text-primary');
+      sortBy(key);
+    });
+  });
+})();
+</script>
+{% endblock %}

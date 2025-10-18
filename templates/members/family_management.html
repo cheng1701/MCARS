@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Family Management{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Member Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'members:member_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'members:member_profile' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i> My Profile
+                        </a>
+                        <a href="{% url 'members:family_management' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-users me-2"></i> Family Management
+                        </a>
+                        <a href="{% url 'members:payment_history' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-credit-card me-2"></i> Payment History
+                        </a>
+                        <a href="{% url 'members:subscription_management' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-sync-alt me-2"></i> Subscription
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Family Management</h2>
+                    <a href="{% url 'members:add_child' %}" class="btn btn-warning">
+                        <i class="fas fa-plus me-2"></i> Add Child
+                    </a>
+                </div>
+
+                {% if not member.membership_type.is_family %}
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i> Family Management Not Available</h5>
+                    <p class="mb-0">Family management is only available for Family Membership Plans. <a href="{% url 'members:subscription_management' %}" class="alert-link">Upgrade your membership</a> to add family members.</p>
+                </div>
+                {% else %}
+
+                {% if children %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Your Family Members</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for child in children %}
+                            <div class="col-md-6 mb-4">
+                                <div class="child-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="child-name">{{ child.first_name }} {{ child.last_name }}</div>
+                                            {% if child.birthdate %}
+                                            <p class="mb-2">Birthdate: {{ child.birthdate|date:"F j, Y" }}</p>
+                                            {% endif %}
+                                            {% if child.notes %}
+                                            <p class="mb-2">Notes: {{ child.notes }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="{% url 'members:edit_child' child.id %}"><i class="fas fa-edit me-2"></i> Edit</a></li>
+                                                <li>
+                                                    <form action="{% url 'members:delete_child' child.id %}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this child?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="fas fa-trash-alt me-2"></i> Remove
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-users fa-4x text-muted"></i>
+                        </div>
+                        <h3 class="mb-3">No Family Members Added Yet</h3>
+                        <p class="mb-4">Your family membership allows you to add children to your account.</p>
+                        <a href="{% url 'members:add_child' %}" class="btn btn-warning">
+                            <i class="fas fa-plus me-2"></i> Add Child
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning">
+                        <h4 class="mb-0 text-dark">Family Membership Benefits</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-ticket-alt fa-2x text-primary"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Family Events</h5>
+                                        <p>Access to family-oriented events and activities for all family members.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-gift fa-2x text-danger"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Children's Programs</h5>
+                                        <p>Special programs and activities designed for children of members.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-percentage fa-2x text-success"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Family Discounts</h5>
+                                        <p>Special discounts on family-oriented products and services.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-calendar-alt fa-2x text-warning"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Family Calendar</h5>
+                                        <p>Exclusive access to our family events calendar with activities for all ages.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

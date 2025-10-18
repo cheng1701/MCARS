@@ -1,0 +1,37 @@
+{% block title %}IFT-MCARS Management{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Member Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'members:member_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'members:member_profile' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i> My Profile
+                        </a>
+                        {% if member.membership_type.is_family %}
+                        <a href="{% url 'members:family_management' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users me-2"></i> Family Management
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'members:payment_history' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-credit-card me-2"></i> Payment History
+                        </a>
+                        <a href="{% url 'members:subscription_management' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-sync-alt me-2"></i> IFT-MCARS
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <h2 class="mb-4">IFT-MCARS Management</h2>

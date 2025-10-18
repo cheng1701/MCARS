@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Child{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'members:member_dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'members:family_management' %}">Family Management</a></li>
+                        <li class="breadcrumb-item active">Add Child</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Add Child</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="id_first_name" class="form-label">First Name</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="text-danger">
+                                        {{ form.first_name.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_last_name" class="form-label">Last Name</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="text-danger">
+                                        {{ form.last_name.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_birthdate" class="form-label">Birthdate</label>
+                                {{ form.birthdate }}
+                                {% if form.birthdate.errors %}
+                                <div class="text-danger">
+                                    {{ form.birthdate.errors }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Optional</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_notes" class="form-label">Notes</label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                <div class="text-danger">
+                                    {{ form.notes.errors }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Optional. Add any special notes or information about this child.</div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'members:family_management' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Add Child</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-header bg-warning">
+                            <h4 class="mb-0 text-dark">Family Membership Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>As a family membership holder, you can add your children to your membership profile. This allows them to participate in member activities and events suitable for their age group.</p>
+                            <p>Benefits for children include:</p>
+                            <ul>
+                                <li>Access to children's programs and activities</li>
+                                <li>Participation in family events</li>
+                                <li>Special birthday recognition</li>
+                                <li>Age-appropriate communications and opportunities</li>
+                            </ul>
+                            <p class="mb-0"><strong>Note:</strong> Children remain active members as long as your family membership is active.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

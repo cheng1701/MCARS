@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Join IFT-MCARS{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="bg-primary py-5 text-white">
+    <div class="container text-center">
+        <h1 class="fw-bold">Become a Member</h1>
+        <p class="lead">Join our community and enjoy exclusive benefits</p>
+    </div>
+</section>
+
+<!-- Registration Form -->
+<section class="form-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="form-card">
+                    <h2 class="text-center mb-4">Membership Application</h2>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary">Account Information</h4>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_first_name" class="form-label">First Name</label>
+                                    <input type="text" name="first_name" id="id_first_name" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_last_name" class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" id="id_last_name" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="id_email" class="form-label">Email Address</label>
+                                <input type="email" name="email" id="id_email" class="form-control" required>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_username" class="form-label">Username</label>
+                                    {{ user_form.username }}
+                                    {% if user_form.username.errors %}
+                                        <div class="text-danger">
+                                            {{ user_form.username.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_phone_number" class="form-label">Phone Number</label>
+                                    {{ member_form.phone_number }}
+                                    {% if member_form.phone_number.errors %}
+                                        <div class="text-danger">
+                                            {{ member_form.phone_number.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label for="id_password1" class="form-label">Password</label>
+                                    {{ user_form.password1 }}
+                                    {% if user_form.password1.errors %}
+                                        <div class="text-danger">
+                                            {{ user_form.password1.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_password2" class="form-label">Confirm Password</label>
+                                    {{ user_form.password2 }}
+                                    {% if user_form.password2.errors %}
+                                        <div class="text-danger">
+                                            {{ user_form.password2.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary">Address Information</h4>
+
+                            <div class="mb-3">
+                                <label for="id_street" class="form-label">Street Address</label>
+                                {{ address_form.street }}
+                                {% if address_form.street.errors %}
+                                    <div class="text-danger">
+                                        {{ address_form.street.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_city" class="form-label">City</label>
+                                    {{ address_form.city }}
+                                    {% if address_form.city.errors %}
+                                        <div class="text-danger">
+                                            {{ address_form.city.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_state" class="form-label">State</label>
+                                    {{ address_form.state }}
+                                    {% if address_form.state.errors %}
+                                        <div class="text-danger">
+                                            {{ address_form.state.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label for="id_zip_code" class="form-label">Zip Code</label>
+                                    {{ address_form.zip_code }}
+                                    {% if address_form.zip_code.errors %}
+                                        <div class="text-danger">
+                                            {{ address_form.zip_code.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_country" class="form-label">Country</label>
+                                    {{ address_form.country }}
+                                    {% if address_form.country.errors %}
+                                        <div class="text-danger">
+                                            {{ address_form.country.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="mb-3 text-primary">Membership Selection</h4>
+
+                            <div class="mb-3">
+                                <label for="id_membership_type" class="form-label">Choose a Membership Plan</label>
+                                {{ member_form.membership_type }}
+                                {% if member_form.membership_type.errors %}
+                                    <div class="text-danger">
+                                        {{ member_form.membership_type.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mt-3">
+                                <p class="mb-1"><i class="fas fa-info-circle text-primary me-2"></i> All memberships require approval by our member managers.</p>
+                                <p><i class="fas fa-info-circle text-primary me-2"></i> Payment will be processed after your application is approved.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">Submit Application</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Why Join?</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Access to exclusive member events</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Special discounts and offers</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Connect with other members</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Member-only resources</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Family benefits (with Family plan)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning">
+                        <h4 class="mb-0 text-dark">Need Help?</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>If you have any questions about our membership options or need assistance with your application, please contact us:</p>
+                        <p><i class="fas fa-envelope me-2 text-primary"></i> <a href="mailto:support@ift-mcars.com">support@ift-mcars.com</a></p>
+                        <p><i class="fas fa-phone me-2 text-primary"></i> (123) 456-7890</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Bootstrap form validation classes
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select');
+
+        // Add Bootstrap validation classes to form fields
+        inputs.forEach(input => {
+            if (!input.classList.contains('form-control') && !input.classList.contains('form-select') && input.type !== 'checkbox') {
+                input.classList.add('form-control');
+            }
+            if (input.type === 'checkbox' && !input.classList.contains('form-check-input')) {
+                input.classList.add('form-check-input');
+            }
+        });
+    });
+</script>
+{% endblock %}

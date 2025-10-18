@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Departments - {{ unit.get_display_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_detail' unit.pk %}">{{ unit.get_display_name }}</a></li>
+        <li class="breadcrumb-item active">Departments</li>
+      </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-1">Headquarters Departments</h3>
+        <p class="text-muted mb-0">Unit: {{ unit.get_display_name }}</p>
+      </div>
+      <div>
+        <a href="{% url 'units:unit_detail' unit.pk %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Back to Unit
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Create Department</h5>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label" for="id_name">Name</label>
+                {{ form.name }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_order">Order</label>
+                  {{ form.order }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_leader">Leader (optional)</label>
+                  {{ form.leader }}
+                </div>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Existing Departments</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if departments %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 60px;">Order</th>
+                    <th>Name</th>
+                    <th>Leader</th>
+                    <th>Staff</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for d in departments %}
+                  <tr>
+                    <td><span class="badge bg-secondary">{{ d.order }}</span></td>
+                    <td>{{ d.name }}</td>
+                    <td>
+                      {% if d.leader %}
+                        {% if d.leader.profile_image %}
+                          <img src="{{ d.leader.profile_image.url }}" alt="{{ d.leader.user.get_full_name }}" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                        {% endif %}
+                        <a href="{% url 'members:member_detail' d.leader.id %}" class="text-primary fw-bold text-decoration-none">{{ d.leader.get_ranked_name|default:d.leader.user.get_full_name }}</a>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ d.staff_count }}</td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'units:manage_department' unit.pk d.pk %}">Manage</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <div class="p-3">
+                <div class="alert alert-info mb-0">No departments have been created for this unit yet.</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,373 @@
+/* Dark Theme CSS */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-weight: 400;
+    text-shadow: 0 0.05rem 0.05rem rgba(0, 0, 0, 0.3);
+}
+
+/* Card backgrounds */
+.card {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.card-body {
+    color: #e0e0e0;
+}
+
+.card-header:not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info) {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.card-footer {
+    background-color: #2d2d2d;
+    border-top-color: #333;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #121212 !important;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}
+
+.navbar-light .navbar-brand {
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+    color: #80bdff;
+}
+
+/* Light backgrounds become dark */
+.bg-light {
+    background-color: #121212 !important;
+}
+
+/* Background sections */
+section.bg-light {
+    background-color: #121212 !important;
+    color: #e0e0e0;
+}
+
+section.bg-warning {
+    background-color: #664d03 !important;
+    color: #ffffff;
+}
+
+section.bg-warning h2, section.bg-warning p {
+    color: #ffffff !important;
+}
+
+/* Form controls */
+.form-control, .form-select {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.input-group-text {
+    background-color: #333;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #666;
+}
+
+/* Table styling */
+.table {
+    color: #e0e0e0;
+}
+
+.table-bordered {
+    border-color: #444;
+}
+
+.table-bordered td, .table-bordered th {
+    border-color: #444;
+}
+
+.table-bordered {
+    border-color: #333;
+}
+
+.table-bordered td, .table-bordered th {
+    border-color: #333;
+}
+
+.table thead th {
+    background-color: #2d2d2d;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: #1e1e1e;
+}
+
+.breadcrumb-item a {
+    color: #80bdff;
+    font-weight: 500;
+}
+
+.breadcrumb-item.active {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+/* Plan cards */
+.plan-card {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.plan-header {
+    background-color: #2d2d2d;
+}
+
+/* Override plan header colors for dark theme */
+.plan-free .plan-header {
+    background-color: #2d2d2d;
+}
+
+.plan-monthly .plan-header {
+    background-color: #333333;
+}
+
+.plan-family .plan-header {
+    background-color: #3a3a2c;
+}
+
+.plan-lifetime .plan-header {
+    background-color: #2c3a2c;
+}
+
+.plan-yearly .plan-header {
+    background-color: #2c2c3a;
+}
+
+.plan-features li {
+    border-bottom-color: #333;
+}
+
+/* Accordion styling */
+.accordion-item {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.accordion-button {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #ffffff;
+    background-color: #333;
+    font-weight: 500;
+}
+
+.accordion-button:focus {
+    border-color: #444;
+    box-shadow: 0 0 0 0.25rem rgba(128, 189, 255, 0.25);
+}
+
+.accordion-body {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+/* Links */
+a:not(.btn) {
+    color: #80bdff;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+a:hover:not(.btn) {
+    color: #9ecbff;
+    text-decoration: underline;
+}
+
+/* Text colors */
+.text-muted {
+    color: #adb5bd !important;
+}
+
+/* Preserve original colors for alerts, buttons, badges */
+.btn-outline-primary {
+    color: #80bdff;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Modal backgrounds */
+.modal-content {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+.modal-header {
+    border-bottom-color: #333;
+}
+
+.modal-footer {
+    border-top-color: #333;
+}
+
+/* List groups */
+.list-group-item {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+/* Team cards */
+.team-member {
+    background-color: #1e1e1e;
+}
+
+/* Improve text readability */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.lead {
+    color: #e0e0e0;
+    font-weight: 400;
+}
+
+strong, .fw-bold {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Paragraph text */
+p {
+    color: #e0e0e0;
+}
+
+/* Hero sections */
+.hero-section {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Shadows for better visibility in dark mode */
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.3) !important;
+}
+
+.shadow {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.4) !important;
+}
+
+/* Update the dropdown menus */
+.dropdown-menu {
+    background-color: #2d2d2d;
+    border-color: #333;
+}
+
+.dropdown-item {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #333;
+    color: #fff;
+}
+
+.dropdown-divider {
+    border-top-color: #444;
+}
+
+/* Membership Plans specific styles */
+.plan-card {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+.plan-header h3 {
+    color: #ffffff;
+}
+
+.plan-price, .plan-duration {
+    color: #e0e0e0;
+}
+
+.plan-features ul li {
+    color: #e0e0e0;
+}
+
+.table tbody td {
+    color: #e0e0e0;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #ffffff;
+}
+
+.accordion-button {
+    color: #e0e0e0;
+}
+
+.accordion-body {
+    color: #e0e0e0;
+}
+
+/* FAQ specific styles for dark theme */
+.table-striped > tbody > tr {
+    color: #e0e0e0;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.table th {
+    color: #ffffff;
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+/* Fix badge text colors */
+.badge.bg-success, .badge.bg-danger, .badge.bg-warning, 
+.badge.bg-info, .badge.bg-primary, .badge.bg-secondary {
+    color: #ffffff !important;
+}
+
+.badge.bg-light {
+    color: #212529 !important;
+}

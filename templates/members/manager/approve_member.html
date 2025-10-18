@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Membership{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'members:manager_dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'members:pending_approvals' %}">Pending Approvals</a></li>
+                        <li class="breadcrumb-item active">Approve Member</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">Approve Membership Application</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-2 text-center">
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                                    <span class="text-white fw-bold fs-3">{{ member.user.first_name|first }}{{ member.user.last_name|first }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                                <p class="mb-1"><strong>Email:</strong> {{ member.user.email }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ member.phone_number }}</p>
+                                <p class="mb-1"><strong>Membership Type:</strong> {{ member.membership_type.name }}</p>
+                                <p class="mb-1"><strong>Applied On:</strong> {{ member.member_since|date:"F j, Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-info-circle me-2"></i> Membership Details</h5>
+                            <p class="mb-1"><strong>Membership Type:</strong> {{ member.membership_type.name }}</p>
+                            <p class="mb-1"><strong>Price:</strong> 
+                                {% if member.membership_type.billing_frequency == 'free' %}
+                                    Free for one year
+                                {% elif member.membership_type.billing_frequency == 'lifetime' %}
+                                    ${{ member.membership_type.price }} (one-time payment)
+                                {% else %}
+                                    ${{ member.membership_type.price }} per {{ member.membership_type.billing_frequency }}
+                                {% endif %}
+                            </p>
+                            <p class="mb-1"><strong>Family Membership:</strong> {% if member.membership_type.is_family %}Yes{% else %}No{% endif %}</p>
+                            <p class="mb-0"><strong>Billing Frequency:</strong> {{ member.membership_type.billing_frequency|title }}</p>
+                        </div>
+
+                        <form method="post" class="mt-4">
+                            {% csrf_token %}
+                            <div class="alert alert-warning">
+                                <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Approving this membership will:</p>
+                                <ul class="mb-0 mt-2">
+                                    <li>Change the member's status to "Active"</li>
+                                    <li>Set appropriate expiration date based on membership type</li>
+                                    <li>Allow the member to access all membership features</li>
+                                    <li>Send an approval notification email to the member</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'members:pending_approvals' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i> Approve Membership
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h4 class="mb-0">Member Address</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if member.address %}
+                        <address>
+                            <strong>{{ member.user.first_name }} {{ member.user.last_name }}</strong><br>
+                            {{ member.address.street }}<br>
+                            {{ member.address.city }}, {{ member.address.state }} {{ member.address.zip_code }}<br>
+                            {{ member.address.country }}
+                        </address>
+                        {% else %}
+                        <p class="text-muted">No address information provided.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

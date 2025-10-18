@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% block title %}Ranks{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/themes/base/jquery-ui.min.css">
+<style>
+    /* Styling for the row being dragged */
+    .ui-sortable-helper {
+        display: table;
+        background-color: #f8f9fa;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border: 1px solid #007bff;
+        opacity: 0.9;
+        transform: rotate(1deg);
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+    /* Cursor styling for rows */
+    .sortable-table tbody tr {
+        cursor: grab;
+    }
+    .sortable-table tbody tr:active {
+        cursor: grabbing;
+    }
+    .sortable-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Placeholder styling - this is the highlighted drop area */
+    .ui-sortable-placeholder {
+        visibility: visible !important;
+        background-color: rgba(0, 123, 255, 0.1);
+        border: 2px dashed #007bff;
+        border-radius: 4px;
+        height: 55px;
+        animation: pulse 1.5s infinite;
+        margin: 12px 0;
+        position: relative;
+    }
+
+    /* Add arrow indicators to the placeholder */
+    .ui-sortable-placeholder::before,
+    .ui-sortable-placeholder::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translateX(-50%);
+    }
+
+    .ui-sortable-placeholder::before {
+        top: -10px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #007bff;
+    }
+
+    .ui-sortable-placeholder::after {
+        bottom: -10px;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #007bff;
+    }
+
+    @keyframes pulse {
+        0% { background-color: rgba(0, 123, 255, 0.05); }
+        50% { background-color: rgba(0, 123, 255, 0.15); }
+        100% { background-color: rgba(0, 123, 255, 0.05); }
+    }
+
+    /* Styling for successful updates */
+    .rank-order-updated {
+        background-color: #d4edda;
+        transition: background-color 1s;
+    }
+
+    /* Handle styling - simplified */
+    .drag-handle {
+        cursor: grab;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .drag-handle:hover {
+        color: #007bff;
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+    .sortable-table tbody tr:active .drag-handle {
+        cursor: grabbing;
+        color: #0056b3;
+    }
+
+    /* Keep the row draggable but focus on the handle */
+    .sortable-table tbody tr {
+        cursor: pointer;
+    }
+
+    /* Styles for potential drop targets */
+    .potential-drop-target {
+        transition: padding 0.2s ease-in-out;
+    }
+
+    /* Active drop target highlighting */
+    .active-drop-target {
+        border: 3px solid #28a745 !important;
+        box-shadow: 0 0 15px rgba(40, 167, 69, 0.3) !important;
+        animation: pulseBorder 1s infinite !important;
+    }
+
+    @keyframes pulseBorder {
+        0% { border-color: rgba(40, 167, 69, 0.6); }
+        50% { border-color: rgba(40, 167, 69, 1); }
+        100% { border-color: rgba(40, 167, 69, 0.6); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Test div to verify jQuery UI is working -->
+<div id="jquery-ui-test" style="display:none;"></div>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        try {
+            if ($.ui) {
+                console.log('jQuery UI loaded successfully: version ' + $.ui.version);
+                $('#jquery-ui-test').text('jQuery UI: ' + $.ui.version);
+            } else {
+                console.error('jQuery UI not detected');
+                $('#jquery-ui-test').text('jQuery UI not detected').css('color', 'red');
+            }
+        } catch (e) {
+            console.error('Error testing jQuery UI: ' + e.message);
+            $('#jquery-ui-test').text('jQuery UI error: ' + e.message).css('color', 'red');
+        }
+    });
+</script>
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                {% include 'rank/rank_navigation.html' with active_menu='rank_list' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'rank:dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Ranks</li>
+                    </ol>
+                </nav>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>Ranks</h2>
+                        <p class="text-muted"><i class="fas fa-info-circle me-1"></i> Drag the ranks to order them. This will help in promotion management.</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'rank:rank_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Add New Rank
+                        </a>
+                    </div>
+                </div>
+
+                <div id="rank-order-message" class="alert alert-success d-none mb-4">
+                    <i class="fas fa-check-circle me-2"></i> <span id="message-text">Rank order updated successfully</span>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if ranks %}
+                        <div class="table-responsive">
+                            <table class="table table-hover sortable-table" id="rank-table">
+                                <thead>
+                                    <tr>
+                                        <th>Paygrade</th>
+                                        <th>Short Name</th>
+                                        <th>Long Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rank in ranks %}
+                                    <tr data-rank-id="{{ rank.id }}">
+                                        <td><i class="fas fa-grip-lines drag-handle"></i> {{ rank.paygrade }}</td>
+                                        <td>{{ rank.short_name }}</td>
+                                        <td>{{ rank.long_name }}</td>
+                                        <td>
+                                            <a href="{% url 'rank:rank_edit' rank.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'rank:rank_delete' rank.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <p>No ranks have been created yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Ensure jQuery core is loaded first -->
+<script>
+    if (typeof jQuery === 'undefined') {
+        document.write('<script src="https://code.jquery.com/jquery-3.6.0.min.js"><\/script>');
+    }
+</script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+<script>
+    $(document).ready(function() {
+        console.log('Initializing sortable ranks table - basic version');
+        const orderMessage = $('#rank-order-message');
+
+        // Basic sortable initialization
+        $('#rank-table tbody').sortable({
+            items: 'tr',
+            handle: '.drag-handle',
+            placeholder: 'ui-sortable-placeholder',
+            update: function(event, ui) {
+                saveRankOrder();
+            }
+        });
+
+        // Simple function to save rank order
+        function saveRankOrder() {
+            const rankOrders = [];
+
+            // Collect rank IDs and their new order
+            $('#rank-table tbody tr').each(function(index) {
+                const rankId = $(this).data('rank-id');
+                rankOrders.push({
+                    id: rankId,
+                    order: index + 1
+                });
+            });
+
+            // Show message
+            orderMessage.removeClass('d-none alert-danger').addClass('alert-info')
+                .find('#message-text').text('Saving rank order...');
+
+            // Send AJAX request
+            $.ajax({
+                url: '{% url "rank:update_rank_order" %}',
+                type: 'POST',
+                data: {
+                    'rank_orders': JSON.stringify(rankOrders),
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        orderMessage.removeClass('alert-info alert-danger').addClass('alert-success')
+                            .find('#message-text').text(response.message);
+
+                        // Highlight all rows briefly
+                        $('#rank-table tbody tr').addClass('rank-order-updated');
+
+                        setTimeout(function() {
+                            $('#rank-table tbody tr').removeClass('rank-order-updated');
+                            setTimeout(function() {
+                                orderMessage.addClass('d-none');
+                            }, 1000);
+                        }, 1000);
+                    } else {
+                        orderMessage.removeClass('alert-info alert-success').addClass('alert-danger')
+                            .find('#message-text').text(response.message);
+                    }
+                },
+                error: function() {
+                    orderMessage.removeClass('alert-info alert-success').addClass('alert-danger')
+                        .find('#message-text').text('An error occurred while saving the rank order');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

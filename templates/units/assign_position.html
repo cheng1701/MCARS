@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Position - {{ unit.get_display_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_detail' unit.pk %}">{{ unit.get_display_name }}</a></li>
+        <li class="breadcrumb-item active">Assign Position</li>
+      </ol>
+    </nav>
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Assign Position</h3>
+            <a href="{% url 'units:unit_detail' unit.pk %}" class="btn btn-light btn-sm">
+              <i class="fas fa-arrow-left me-1"></i> Back to Unit
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <div class="fw-semibold">Member</div>
+              <div><a href="{% url 'members:member_detail' membership.member.id %}" class="text-primary fw-bold text-decoration-none">{{ membership.member.user.get_full_name|default:membership.member.user.username }}</a> <span class="text-muted">({{ membership.member.user.email }})</span></div>
+            </div>
+
+            <div class="mb-4">
+              <div class="fw-semibold">Current Position</div>
+              <div>{{ membership.position.name|default:'Crewmember' }}</div>
+            </div>
+
+            {% if is_co %}
+            <div class="alert alert-info">
+              This member is the Commanding Officer. COs cannot hold other positions. Only the Crewmember role (no specific position) is allowed.
+            </div>
+            {% endif %}
+
+            {% if form.errors or form.non_field_errors %}
+            <div class="alert alert-danger mb-3">
+              <div class="fw-semibold mb-1">Please correct the errors below.</div>
+              {% if form.non_field_errors %}
+              <ul class="mb-0">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="needs-validation" novalidate>
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="id_position" class="form-label">Select Position</label>
+                {{ form.position }}
+                <div class="form-text">Choose a position for this member or leave as Crewmember.{% if is_co %} Note: CO cannot be assigned to another position.{% endif %}</div>
+                {% if form.position.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.position.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <a href="{% url 'units:unit_detail' unit.pk %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Assignment</button>
+              </div>
+            </form>
+
+            <script>
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.forEach.call(forms, function(form) {
+                  // Validate on input/change to show feedback prior to submission
+                  form.querySelectorAll('input, select, textarea').forEach(function(el) {
+                    ['input','change','blur'].forEach(function(evt) {
+                      el.addEventListener(evt, function() {
+                        form.classList.add('was-validated');
+                      });
+                    });
+                  });
+
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

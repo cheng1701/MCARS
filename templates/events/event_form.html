@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="py-4">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ title }}</h5>
+        <a href="{% url 'events:calendar' %}" class="btn btn-outline-light btn-sm">Back to Calendar</a>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Title</label>
+              {{ form.title }}
+              {{ form.title.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Unit</label>
+              {{ form.unit }}
+              {{ form.unit.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Host (optional)</label>
+              {{ form.host }}
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Description</label>
+              {{ form.description }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Start</label>
+              {{ form.start_datetime }}
+              {{ form.start_datetime.errors }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">End</label>
+              {{ form.end_datetime }}
+              {{ form.end_datetime.errors }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Visibility</label>
+              {{ form.visibility_scope }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Location (optional)</label>
+              {{ form.location }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Meeting URL (optional)</label>
+              {{ form.meeting_url }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Image (optional)</label>
+              {{ form.image }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Attendees</label>
+              {{ form.attendees }}
+            </div>
+          </div>
+          <div class="mt-3 d-flex justify-content-end gap-2">
+            <a href="{% url 'events:calendar' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button class="btn btn-success" type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+Membership Application Received
+Membership Application Received
+
+Dear {{ user.first_name }} {{ user.last_name }},
+
+Thank you for applying for membership to the Membership Club. We have received your application and it is currently being reviewed by our team.
+
+Application Details:
+- Membership Type: {{ member.membership_type.name }}
+- Membership ID: {{ member.membership_id }}
+- Application Date: {{ member.member_since|date:"F j, Y" }}
+
+You will receive another email once your application has been approved. This typically takes 1-2 business days.
+
+If you have any questions about your application, please don't hesitate to contact us.
+
+Best regards,
+The Membership Club Team
+
+© {% now "Y" %} Membership Club. All rights reserved.
+123 Club Street, City, State
+Dear {{ user.first_name }} {{ user.last_name }},
+
+Thank you for applying for membership to the Membership Club. We have received your application and it is currently being reviewed by our team.
+
+Application Details:
+- Membership Type: {{ member.membership_type.name }}
+- Membership ID: {{ member.membership_id }}
+- Application Date: {{ member.member_since|date:"F j, Y" }}
+
+You will receive another email once your application has been approved. This typically takes 1-2 business days.
+
+If you have any questions about your application, please don't hesitate to contact us.
+
+Best regards,
+The Membership Club Team
+
+© {% now "Y" %} Membership Club. All rights reserved.
+123 Club Street, City, State

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load member_extras %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                {% include 'rank/rank_navigation.html' with active_menu='people_list' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'rank:dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'rank:people_list' %}">People</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">{{ title }}</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Person Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                {% if person.profile_image %}
+                                <div class="mb-3">
+                                    <img src="{{ person.profile_image.url }}" alt="Profile Picture" class="rounded-circle mx-auto" style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                                {% else %}
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                    {% if person_type == 'member' %}
+                                        <span class="text-white fw-bold">{{ person.user.first_name|first }}{{ person.user.last_name|first }}</span>
+                                    {% else %}
+                                        <span class="text-white fw-bold">{{ person.first_name|first }}{{ person.last_name|first }}</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-9">
+                                <h4>{% if person_type == 'member' %}<a href="{% url 'members:member_detail' person.id %}" class="text-primary fw-bold text-decoration-none">{{ person.get_ranked_name }}</a>{% else %}{{ person.get_ranked_name }}{% endif %}</h4>
+                                {% if person_type == 'member' %}
+                                    <p class="text-muted mb-1">Email: {{ person.user.email }}</p>
+                                    <p class="text-muted mb-0">Member ID: {{ person.membership_id }}</p>
+                                {% else %}
+                                    <p class="text-muted mb-1">Parent: <a href="{% url 'members:member_detail' person.parent.id %}">{{ person.parent.user.get_full_name }}</a></p>
+                                    <p class="text-muted mb-0">Child ID: {{ person.child_id }}</p>
+                                    {% if person.birthdate %}
+                                    <p class="text-muted mb-0">Born: {{ person.birthdate|date:"F j, Y" }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        {% if form.errors or form.non_field_errors %}
+                        <div class="alert alert-danger mb-4">
+                            <h6 class="alert-heading">Please correct the following errors:</h6>
+                            {% if form.non_field_errors %}
+                            <ul class="mb-0">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Rank Assignment Form -->
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.rank.id_for_label }}" class="form-label">
+                                        Rank <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.rank }}
+                                    {% if form.rank.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.rank.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.preferred_theme.id_for_label }}" class="form-label">
+                                        Preferred Theme
+                                    </label>
+                                    {{ form.preferred_theme }}
+                                    <div class="form-text">{{ form.preferred_theme.help_text }}</div>
+                                    {% if form.preferred_theme.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.preferred_theme.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.effective_date.id_for_label }}" class="form-label">
+                                        Effective Date <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.effective_date }}
+                                    {% if form.effective_date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.effective_date.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                    Notes
+                                </label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.notes.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'rank:people_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i> 
+                                    {% if person_type == 'member' %}
+                                        {% if member.rank_association %}Update Rank{% else %}Assign Rank{% endif %}
+                                    {% else %}
+                                        {% if child.child_rank_association %}Update Rank{% else %}Assign Rank{% endif %}
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Bootstrap-style validation: show feedback on input/change before submission
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.forEach.call(forms, function(form) {
+            // Show validation feedback as the user interacts
+            form.querySelectorAll('input, select, textarea').forEach(function(el) {
+                ['input','change','blur'].forEach(function(evt) {
+                    el.addEventListener(evt, function() {
+                        form.classList.add('was-validated');
+                    });
+                });
+            });
+
+            // On submit prevent if invalid
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

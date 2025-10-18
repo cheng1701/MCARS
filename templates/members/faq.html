@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}Frequently Asked Questions - Membership Club{% endblock %}
+
+
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Frequently Asked Questions</h1>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="input-group mb-4">
+                <input type="text" id="faq-search" class="form-control form-control-lg" placeholder="Search FAQs...">
+                <button class="btn btn-primary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="list-group" id="faq-tabs" role="tablist">
+                {% for category in faq_categories %}
+                    <a class="list-group-item list-group-item-action {% if forloop.first %}active{% endif %}" 
+                       id="{{ category.slug }}-tab" 
+                       data-bs-toggle="list" 
+                       href="#{{ category.slug }}" 
+                       role="tab">
+                        {{ category.name }}
+                    </a>
+                {% empty %}
+                    <div class="list-group-item">No categories available</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="tab-content" id="faq-tabContent">
+                {% for category in faq_categories %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ category.slug }}" role="tabpanel">
+                    <div class="accordion" id="{{ category.slug }}Accordion">
+                        {% for faq in category.faqs.all %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="{{ category.slug }}-heading-{{ faq.id }}">
+                                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#{{ category.slug }}-collapse-{{ faq.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="{{ category.slug }}-collapse-{{ faq.id }}">
+                                    {{ faq.question }}
+                                </button>
+                            </h2>
+                            <div id="{{ category.slug }}-collapse-{{ faq.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="{{ category.slug }}-heading-{{ faq.id }}" data-bs-parent="#{{ category.slug }}Accordion">
+                                <div class="accordion-body">
+                                    {{ faq.answer|safe }}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="alert alert-info">No FAQs available in this category yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <h3>Still have questions?</h3>
+            <p class="lead">We're here to help! Contact our support team for personalized assistance.</p>
+            <a href="{% url 'members:contact' %}" class="btn btn-primary btn-lg px-4 mt-2">Contact Us</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FAQ functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('faq-search');
+        const allAccordionItems = document.querySelectorAll('.accordion-item');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        const categoryTabs = document.querySelectorAll('#faq-tabs a');
+        let searchMode = false;
+
+        // Add an "All Results" tab when searching
+        const faqTabs = document.getElementById('faq-tabs');
+        const searchResultsTab = document.createElement('a');
+        searchResultsTab.className = 'list-group-item list-group-item-action d-none';
+        searchResultsTab.id = 'search-results-tab';
+        searchResultsTab.setAttribute('data-bs-toggle', 'list');
+        searchResultsTab.setAttribute('href', '#search-results');
+        searchResultsTab.setAttribute('role', 'tab');
+        searchResultsTab.innerHTML = 'Search Results';
+        faqTabs.insertBefore(searchResultsTab, faqTabs.firstChild);
+
+        // Create a search results tab pane
+        const tabContent = document.getElementById('faq-tabContent');
+        const searchResultsPane = document.createElement('div');
+        searchResultsPane.className = 'tab-pane fade';
+        searchResultsPane.id = 'search-results';
+        searchResultsPane.setAttribute('role', 'tabpanel');
+
+        const searchAccordion = document.createElement('div');
+        searchAccordion.className = 'accordion';
+        searchAccordion.id = 'searchResultsAccordion';
+        searchResultsPane.appendChild(searchAccordion);
+
+        tabContent.insertBefore(searchResultsPane, tabContent.firstChild);
+
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+
+            if (searchTerm === '') {
+                // If search is cleared, restore normal tab view
+                searchMode = false;
+                searchResultsTab.classList.add('d-none');
+                searchResultsPane.classList.remove('show', 'active');
+
+                // Show the originally active tab
+                const activeTab = document.querySelector('#faq-tabs a.active');
+                if (activeTab) {
+                    const target = document.querySelector(activeTab.getAttribute('href'));
+                    if (target) {
+                        target.classList.add('show', 'active');
+                    }
+                } else {
+                    // If no active tab, activate the first one
+                    const firstTab = document.querySelector('#faq-tabs a:not(#search-results-tab)');
+                    if (firstTab) {
+                        firstTab.classList.add('active');
+                        const target = document.querySelector(firstTab.getAttribute('href'));
+                        if (target) {
+                            target.classList.add('show', 'active');
+                        }
+                    }
+                }
+
+                // Clear the search results
+                searchAccordion.innerHTML = '';
+                return;
+            }
+
+            // Enter search mode
+            searchMode = true;
+            searchResultsTab.classList.remove('d-none');
+
+            // Activate the search results tab
+            categoryTabs.forEach(tab => tab.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('show', 'active'));
+            searchResultsTab.classList.add('active');
+            searchResultsPane.classList.add('show', 'active');
+
+            // Clear previous search results
+            searchAccordion.innerHTML = '';
+
+            // Clone matching items to the search results
+            let foundResults = 0;
+            allAccordionItems.forEach(item => {
+                const heading = item.querySelector('.accordion-button').textContent.toLowerCase();
+                const body = item.querySelector('.accordion-body').textContent.toLowerCase();
+
+                if (heading.includes(searchTerm) || body.includes(searchTerm)) {
+                    // Clone the item for search results
+                    const clone = item.cloneNode(true);
+                    const cloneId = `search-result-${foundResults}`;
+                    const cloneButton = clone.querySelector('.accordion-button');
+                    const cloneCollapse = clone.querySelector('.accordion-collapse');
+
+                    // Update IDs and references to avoid conflicts
+                    cloneButton.setAttribute('data-bs-target', `#${cloneId}`);
+                    cloneButton.setAttribute('aria-controls', cloneId);
+                    cloneCollapse.id = cloneId;
+                    cloneCollapse.setAttribute('data-bs-parent', '#searchResultsAccordion');
+
+                    // Add category name to help identify the result
+                    const categoryId = item.closest('.tab-pane').id;
+                    const categoryTab = document.querySelector(`a[href="#${categoryId}"]`);
+                    if (categoryTab) {
+                        const categoryBadge = document.createElement('span');
+                        categoryBadge.className = 'badge bg-secondary ms-2';
+                        categoryBadge.textContent = categoryTab.textContent.trim();
+                        cloneButton.appendChild(categoryBadge);
+                    }
+
+                    searchAccordion.appendChild(clone);
+                    foundResults++;
+                }
+            });
+
+            // Show message if no results found
+            if (foundResults === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'alert alert-info';
+                noResults.textContent = 'No FAQs found matching your search term.';
+                searchAccordion.appendChild(noResults);
+            }
+        });
+
+        // Ensure proper accordion behavior
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('accordion-button') || e.target.closest('.accordion-button')) {
+                const button = e.target.classList.contains('accordion-button') ? e.target : e.target.closest('.accordion-button');
+                const targetId = button.getAttribute('data-bs-target');
+                const target = document.querySelector(targetId);
+
+                if (!target) return;
+
+                const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+                // Collapse all other items in this accordion
+                const accordionId = target.getAttribute('data-bs-parent');
+                const accordion = document.querySelector(accordionId);
+
+                if (accordion) {
+                    accordion.querySelectorAll('.accordion-collapse.show').forEach(item => {
+                        if (item.id !== target.id.replace('#', '')) {
+                            item.classList.remove('show');
+                            const itemButton = document.querySelector(`[data-bs-target="#${item.id}"]`);
+                            if (itemButton) {
+                                itemButton.classList.add('collapsed');
+                                itemButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    });
+                }
+
+                // Toggle this item
+                if (!isExpanded) {
+                    target.classList.add('show');
+                    button.classList.remove('collapsed');
+                    button.setAttribute('aria-expanded', 'true');
+                } else {
+                    target.classList.remove('show');
+                    button.classList.add('collapsed');
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

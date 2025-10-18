@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Organizational Chart{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+        <li class="breadcrumb-item active">Organizational Chart</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">Organizational Chart</h1>
+      <a href="{% url 'units:unit_list' %}" class="btn btn-outline-secondary"><i class="fas fa-list me-1"></i> All Units</a>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <form class="row g-3 align-items-end">
+              <div class="col-md-6">
+                <label class="form-label" for="org-search">Search by Unit Name or Hull</label>
+                <input id="org-search" type="text" class="form-control" placeholder="e.g., Enterprise, NCC-1701">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="org-sort">Sort</label>
+                <select id="org-sort" class="form-select">
+                  <option value="hierarchy" selected>Hierarchy</option>
+                  <option value="name">Unit Name (A–Z)</option>
+                  <option value="hull">Hull Number (A–Z)</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Hierarchical Tree -->
+        <div id="hierarchy-view" class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-sitemap me-2"></i>Hierarchy</h5>
+          </div>
+          <div class="card-body">
+            {% if roots %}
+            <ul class="list-group" id="org-tree">
+              {% for r in roots %}
+                {% include 'units/_org_node.html' with unit=r %}
+              {% endfor %}
+            </ul>
+            {% else %}
+            <div class="alert alert-info mb-0">No units found.</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Flat List -->
+        <div id="flat-view" class="card shadow-sm d-none mt-3">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Units</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle" id="units-table">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width:110px;">Unit</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Hull</th>
+                    <th>Location</th>
+                    <th>CO</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chain of Command Sidebar -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm position-sticky" style="top: 1rem;">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Chain of Command</h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted">Select a unit to view its chain of command up to Fleet Commander.</p>
+            <div id="chain-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Data for client-side operations
+  const UNITS = {{ units_json|safe }};
+  const byId = new Map(UNITS.map(u => [u.id, u]));
+  const CAN_SEE_INTERNAL = {% if user.is_authenticated %}{% if user.is_staff or user.is_superuser or user.groups.all.0.name == 'unit_manager' %}true{% else %}false{% endif %}{% else %}false{% endif %};
+
+  // Elements
+  const searchInput = document.getElementById('org-search');
+  const sortSelect = document.getElementById('org-sort');
+  const hierarchyView = document.getElementById('hierarchy-view');
+  const flatView = document.getElementById('flat-view');
+  const tableBody = document.querySelector('#units-table tbody');
+  const chainList = document.getElementById('chain-list');
+
+  function unitMatches(u, term) {
+    if (!term) return true;
+    term = term.toLowerCase();
+    return (u.name && u.name.toLowerCase().includes(term)) || (u.hull && u.hull.toLowerCase().includes(term));
+  }
+
+  function renderFlat(sortBy = 'name', term = '') {
+    // Filter and sort
+    let rows = UNITS.filter(u => unitMatches(u, term));
+    if (sortBy === 'name') rows.sort((a,b) => (a.short_name || '').localeCompare(b.short_name || ''));
+    else if (sortBy === 'hull') rows.sort((a,b) => (a.hull || '').localeCompare(b.hull || ''));
+
+    // Render
+    tableBody.innerHTML = rows.map(u => `
+      <tr data-unit-id="${u.id}">
+        <td>
+          ${u.image_url ? `<img src="${u.image_url}" alt="${u.name}" class="rounded" style="width:100px;height:100px;object-fit:cover;">` : ''}
+        </td>
+        <td><a class="unit-link" href="${u.public_url}" data-unit-id="${u.id}">${u.name}</a></td>
+        <td>${u.type}</td>
+        <td>${u.hull || ''}</td>
+        <td>${[u.city, u.state, u.country].filter(Boolean).join(', ')}</td>
+        <td>${u.co_id ? `<a href="${u.co_url}">${u.co_name}</a>` : '<span class="text-muted">Vacant</span>'}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="${u.public_url}"><i class="fas fa-eye me-1"></i> Public</a>
+          ${CAN_SEE_INTERNAL ? `<a class=\"btn btn-sm btn-outline-secondary\" href=\"${u.detail_url}\"><i class=\"fas fa-info-circle me-1\"></i> Internal</a>` : ``}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function setMode(mode) {
+    if (mode === 'hierarchy') {
+      hierarchyView.classList.remove('d-none');
+      flatView.classList.add('d-none');
+    } else {
+      hierarchyView.classList.add('d-none');
+      flatView.classList.remove('d-none');
+      renderFlat(mode, searchInput.value.trim());
+    }
+  }
+
+  function highlightHierarchy(term) {
+    // Simple filter/highlight: show all but dim non-matching nodes
+    const items = document.querySelectorAll('#org-tree .list-group-item');
+    term = (term || '').toLowerCase();
+    items.forEach(li => {
+      const text = li.textContent.toLowerCase();
+      if (!term) {
+        li.style.opacity = '';
+        li.classList.remove('border-warning');
+      } else if (text.includes(term)) {
+        li.style.opacity = '1';
+        li.classList.add('border-warning');
+      } else {
+        li.style.opacity = '0.5';
+        li.classList.remove('border-warning');
+      }
+    });
+  }
+
+  function renderChainOfCommand(unitId) {
+    const path = [];
+    let current = byId.get(unitId);
+    while (current) {
+      path.push(current);
+      current = current.parent_id ? byId.get(current.parent_id) : null;
+    }
+    // reverse to top-down
+    path.reverse();
+
+    if (!path.length) {
+      chainList.innerHTML = '<div class="text-muted">No unit selected.</div>';
+      return;
+    }
+
+    chainList.innerHTML = path.map((u, idx) => `
+      <div class="d-flex align-items-center mb-2">
+        ${u.image_url ? `<img src="${u.image_url}" class="rounded me-2" style="width:40px;height:40px;object-fit:cover;">` : ''}
+        <div class="flex-grow-1">
+          <div><a href="${u.public_url}" class="text-decoration-none">${u.name}</a></div>
+          <div class="text-muted small">${u.type}</div>
+        </div>
+        ${idx < path.length - 1 ? '<i class="fas fa-chevron-right text-muted ms-2"></i>' : ''}
+      </div>
+    `).join('');
+  }
+
+  // Delegated click to set chain from links
+  document.addEventListener('click', function(e) {
+    const unitLink = e.target.closest('.unit-link, .unit-node');
+    if (unitLink && unitLink.dataset.unitId) {
+      const id = parseInt(unitLink.dataset.unitId);
+      renderChainOfCommand(id);
+    }
+  });
+
+  // Wire up controls
+  sortSelect.addEventListener('change', function() {
+    const mode = sortSelect.value;
+    setMode(mode);
+  });
+
+  searchInput.addEventListener('input', function() {
+    const term = searchInput.value.trim();
+    if (sortSelect.value === 'hierarchy') {
+      highlightHierarchy(term);
+    } else {
+      renderFlat(sortSelect.value, term);
+    }
+  });
+
+  // Initial render
+  setMode('hierarchy');
+
+</script>
+{% endblock %}

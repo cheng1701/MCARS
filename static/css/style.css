@@ -1,0 +1,102 @@
+/* Base styles - will apply regardless of theme */
+
+/* Hero section styling */
+.hero-section {
+    padding: 100px 0;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* Membership plan cards */
+.plan-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+}
+
+.plan-header {
+    padding: 20px;
+    text-align: center;
+}
+
+.plan-price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+.plan-duration {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.plan-features {
+    padding: 20px;
+}
+
+.plan-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-footer {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Plan specific styling */
+.plan-free .plan-header {
+    background-color: #f8f9fa;
+}
+
+.plan-monthly .plan-header {
+    background-color: #e9ecef;
+}
+
+.plan-family .plan-header {
+    background-color: #fff3cd;
+}
+
+.plan-lifetime .plan-header {
+    background-color: #d1e7dd;
+}
+
+.plan-yearly .plan-header {
+    background-color: #cfe2ff;
+}
+
+/* Team member cards */
+.team-member {
+    transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-5px);
+}
+
+/* For smaller screens */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+
+    .plan-price {
+        font-size: 2rem;
+    }
+}

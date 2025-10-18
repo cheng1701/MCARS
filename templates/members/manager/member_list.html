@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load member_extras %}
+
+{% block title %}Member List{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Manager Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'members:manager_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'members:pending_approvals' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-clock me-2"></i> Pending Approvals
+                            {% if pending_count > 0 %}
+                            <span class="badge bg-danger rounded-pill ms-1">{{ pending_count }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="{% url 'members:member_list' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-users me-2"></i> Member List
+                        </a>
+                        <a href="{% url 'members:member_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i> My Member Account
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0 text-dark">Filter Members</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{% url 'members:member_list' %}" method="get">
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'members:member_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %} mb-2">All</a>
+                                    <a href="{% url 'members:member_list' %}?status=active" class="btn btn-sm {% if status_filter == 'active' %}btn-success{% else %}btn-outline-success{% endif %} mb-2">Active</a>
+                                    <a href="{% url 'members:member_list' %}?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %} mb-2">Pending</a>
+                                    <a href="{% url 'members:member_list' %}?status=expired" class="btn btn-sm {% if status_filter == 'expired' %}btn-danger{% else %}btn-outline-danger{% endif %} mb-2">Expired</a>
+                                    <a href="{% url 'members:member_list' %}?status=cancelled" class="btn btn-sm {% if status_filter == 'cancelled' %}btn-secondary{% else %}btn-outline-secondary{% endif %} mb-2">Cancelled</a>
+                                    <a href="{% url 'members:member_list' %}?status=rejected" class="btn btn-sm {% if status_filter == 'rejected' %}btn-dark{% else %}btn-outline-dark{% endif %}">Rejected</a>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="q" class="form-label">Search</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="q" name="q" value="{{ query }}" placeholder="Name, Email, ID...">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Member List</h2>
+                    <div>
+                        <button class="btn btn-outline-primary me-2" onclick="window.print()">
+                            <i class="fas fa-print me-2"></i> Print
+                        </button>
+                        <button class="btn btn-outline-success">
+                            <i class="fas fa-file-excel me-2"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Summary -->
+                {% if query or status_filter %}
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="alert-heading mb-1">Filter Applied</h5>
+                            <p class="mb-0">
+                                {% if status_filter %}Status: <strong>{{ status_filter|title }}</strong>{% endif %}
+                                {% if query %}{% if status_filter %} | {% endif %}Search: <strong>"{{ query }}"</strong>{% endif %}
+                            </p>
+                        </div>
+                        <a href="{% url 'members:member_list' %}" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-times me-1"></i> Clear
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Members Table -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if members %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Membership</th>
+                                        <th>Joined</th>
+                                        <th>Expiration</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for member in members %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                                    <span class="text-white fw-bold">{{ member.user.first_name|first }}{{ member.user.last_name|first }}</span>
+                                                </div>
+                                                <div>
+                                                    <div>{{ member.get_ranked_name }}</div>
+                                                    <small class="text-muted">{{ member.user.email }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ member.membership_type.name }}</td>
+                                        <td>{{ member.member_since|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if member.membership_type.billing_frequency == 'lifetime' %}
+                                                <span class="badge bg-primary">Lifetime</span>
+                                            {% elif member.expiration_date %}
+                                                {{ member.expiration_date|date:"M d, Y" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if member.status == 'active' %}bg-success{% elif member.status == 'pending' %}bg-warning text-dark{% elif member.status == 'expired' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                {{ member.status|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item" href="{% url 'members:member_detail' member.id %}"><i class="fas fa-eye me-2"></i> View Details</a></li>
+                                                    {% if member.status == 'pending' %}
+                                                    <li><a class="dropdown-item text-success" href="{% url 'members:approve_member' member.id %}"><i class="fas fa-check me-2"></i> Approve</a></li>
+                                                    <li><a class="dropdown-item text-danger" href="{% url 'members:reject_member' member.id %}"><i class="fas fa-times me-2"></i> Reject</a></li>
+                                                    {% endif %}
+                                                    {% if member.status == 'expired' or member.status == 'cancelled' %}
+                                                    <li><a class="dropdown-item" href="#"><i class="fas fa-sync-alt me-2"></i> Reactivate</a></li>
+                                                    {% endif %}
+                                                    {% if member.status == 'active' %}
+                                                    <li><a class="dropdown-item" href="#"><i class="fas fa-ban me-2"></i> Deactivate</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-users fa-4x text-muted"></i>
+                            </div>
+                            <h3 class="mb-3">No Members Found</h3>
+                            <p class="mb-0">No members match your current filter criteria.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

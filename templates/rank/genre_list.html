@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Genres{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Rank Manager Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'rank:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+
+                        <!-- Rank Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-medal me-2"></i> Rank Management</strong>
+                        </div>
+                        <a href="{% url 'rank:rank_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-list me-2"></i> All Ranks
+                        </a>
+                        <a href="{% url 'rank:rank_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus me-2"></i> Add New Rank
+                        </a>
+
+                        <!-- Theme Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-palette me-2"></i> Theme Management</strong>
+                        </div>
+                        <a href="{% url 'rank:theme_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-images me-2"></i> All Themes
+                        </a>
+                        <a href="{% url 'rank:theme_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle me-2"></i> Create Theme
+                        </a>
+
+                        <!-- Configuration Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-cogs me-2"></i> Configuration</strong>
+                        </div>
+                        <a href="{% url 'rank:genre_list' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-tags me-2"></i> Manage Genres
+                        </a>
+                        <a href="{% url 'rank:branch_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-code-branch me-2"></i> Manage Branches
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Genres</h2>
+                    <a href="{% url 'rank:genre_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> Add New Genre
+                    </a>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if genres %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for genre in genres %}
+                                    <tr>
+                                        <td>{{ genre.name }}</td>
+                                        <td>{{ genre.description|truncatechars:100 }}</td>
+                                        <td>
+                                            <a href="{% url 'rank:genre_edit' genre.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'rank:genre_delete' genre.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <p>No genres have been created yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

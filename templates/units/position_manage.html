@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Positions - {{ unit.get_display_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'units:unit_detail' unit.pk %}">{{ unit.get_display_name }}</a></li>
+        <li class="breadcrumb-item active">Positions</li>
+      </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-1">Positions</h3>
+        <p class="text-muted mb-0">Unit: {{ unit.get_display_name }}</p>
+      </div>
+      <div>
+        <a href="{% url 'units:unit_detail' unit.pk %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i> Back to Unit
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Create Position</h5>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label" for="id_name">Name</label>
+                {{ form.name }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_order">Order</label>
+                  {{ form.order }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label" for="id_max_members">Max Members</label>
+                  {{ form.max_members }}
+                </div>
+              </div>
+              {% if unit.type == 'FLEET_COMMANDER' %}
+              <div class="mb-3 form-check">
+                {{ form.is_special_staff }}
+                <label class="form-check-label" for="id_is_special_staff">Special Staff (works directly for the Fleet Commander)</label>
+              </div>
+              {% endif %}
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Existing Positions</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if positions %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 60px;">Order</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Max</th>
+                    <th>Assigned</th>
+                    <th>Available</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in positions %}
+                  <tr>
+                    <td><span class="badge bg-secondary">{{ p.order }}</span></td>
+                    <td>{{ p.name }}</td>
+                    <td>
+                      {% if p.is_special_staff %}
+                        <span class="badge bg-warning text-dark">Special Staff</span>
+                      {% else %}
+                        <span class="badge bg-secondary">Standard</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ p.max_members }}</td>
+                    <td>{{ p.memberships.filter.is_active.count|default:0 }}</td>
+                    <td>{{ p.get_available_slots }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <div class="p-3">
+                <div class="alert alert-info mb-0">No positions have been created for this unit yet.</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

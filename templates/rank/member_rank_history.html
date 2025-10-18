@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                {% include 'rank/rank_navigation.html' with active_menu='member_list' %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'rank:dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'rank:member_list' %}">Member Ranks</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ title }}</h4>
+                        <a href="{% url 'rank:member_list' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Members
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <!-- Member Info -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                            <span class="text-white fw-bold fs-4">{{ member.user.first_name|first }}{{ member.user.last_name|first }}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-1"><a href="{% url 'members:member_detail' member.id %}" class="text-primary fw-bold text-decoration-none">{{ member.get_full_name }}</a></h5>
+                                        <p class="mb-0 text-muted">{{ member.user.email }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Current Rank</h5>
+                                        {% if current_rank %}
+                                        <div class="d-flex align-items-center">
+                                            {% if member.get_rank_image %}
+                                            <div class="me-3">
+                                                <img src="{{ member.get_rank_image }}" alt="{{ current_rank.rank.short_name }}" class="img-thumbnail" style="max-width: 120px;">
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h5 class="mb-1">{{ current_rank.rank.short_name }}</h5>
+                                                <p class="mb-0 text-muted small">{{ current_rank.rank.paygrade }} - {{ current_rank.rank.long_name }}</p>
+                                                <p class="mb-0 text-muted small">Branch: {{ current_rank.preferred_theme.branch.name }}</p>
+                                                <p class="mb-0 text-muted small">Effective since {{ current_rank.effective_date|date:"M d, Y" }}</p>
+                                                {% if current_rank.preferred_theme %}
+                                                <p class="mb-0 text-muted small">Theme: {{ current_rank.preferred_theme.name }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <p class="text-muted">No rank currently assigned</p>
+                                        {% endif %}
+                                        <div class="mt-3">
+                                            <a href="{% url 'rank:member_rank_assign' member.id %}" class="btn btn-sm btn-primary">
+                                                {% if current_rank %}
+                                                <i class="fas fa-edit me-1"></i> Change Rank
+                                                {% else %}
+                                                <i class="fas fa-plus me-1"></i> Assign Rank
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3">Rank History</h5>
+
+                        {% if rank_history %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Change</th>
+                                        <th>Details</th>
+                                        <th>Assigned By</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for history in rank_history %}
+                                    <tr>
+                                        <td>{{ history.effective_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if history.change_type == 'initial' %}
+                                                <span class="badge bg-success">Initial Assignment</span>
+                                            {% elif history.change_type == 'both' %}
+                                                <span class="badge bg-warning text-dark">Rank & Theme</span>
+                                            {% elif history.change_type == 'theme' %}
+                                                <span class="badge bg-info text-dark">Theme</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">Rank</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if history.change_type == 'theme' or history.change_type == 'both' %}
+                                                <!-- Theme change display -->
+                                                {% if history.previous_theme %}
+                                                <div class="mb-2">
+                                                    <span class="text-muted small">Theme:</span>
+                                                    <span class="badge bg-secondary me-1">{{ history.previous_theme.name }}</span>
+                                                    <i class="fas fa-long-arrow-alt-right mx-1"></i>
+                                                    <span class="badge bg-info text-dark">{{ history.theme.name }}</span>
+                                                </div>
+                                                {% elif history.theme %}
+                                                <div class="mb-2">
+                                                    <span class="text-muted small">Theme:</span>
+                                                    <span class="badge bg-info text-dark">{{ history.theme.name }}</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {% if history.change_type != 'theme' %}
+                                                <!-- Rank change display -->
+                                                <div class="d-flex align-items-center">
+                                                    {% if history.previous_rank %}
+                                                    <span class="badge bg-secondary me-2">{{ history.previous_rank.paygrade }}</span>
+                                                    <i class="fas fa-long-arrow-alt-right mx-2"></i>
+                                                    {% endif %}
+                                                    <span class="badge bg-primary">{{ history.rank.paygrade }}</span>
+                                                    <span class="ms-2">{{ history.rank.short_name }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if history.assigned_by %}
+                                            {{ history.assigned_by.get_full_name }}
+                                            {% else %}
+                                            <span class="text-muted">System</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if history.notes %}
+                                            {{ history.notes }}
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No rank history found for this member.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

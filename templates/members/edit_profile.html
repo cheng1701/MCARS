@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Member Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'members:member_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+                        <a href="{% url 'members:member_profile' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-user me-2"></i> My Profile
+                        </a>
+                        {% if member.membership_type.is_family %}
+                            {% if member.membership_type.is_family %}
+                            <a href="{% url 'members:family_management' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-users me-2"></i> Family Management
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                        <a href="{% url 'members:payment_history' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-credit-card me-2"></i> Payment History
+                        </a>
+                        <a href="{% url 'members:subscription_management' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-sync-alt me-2"></i> Subscription
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'members:member_dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'members:member_profile' %}">My Profile</a></li>
+                        <li class="breadcrumb-item active">Edit Profile</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            {% if member.user != request.user %}
+                                Editing {{ member.user.first_name }} {{ member.user.last_name }}'s Profile
+                                {% if user.is_superuser or user.groups.all.0.name == 'Member Manager' %}
+                                <span class="badge bg-warning text-dark">Admin Mode</span>
+                                {% endif %}
+                            {% else %}
+                                Edit Your Profile
+                            {% endif %}
+                        </h3>
+                        <span class="badge {% if member.status == 'active' %}bg-success{% elif member.status == 'pending' %}bg-warning text-dark{% elif member.status == 'expired' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ member.status|title }}
+                        </span>
+                    </div>
+
+                    <!-- Alert for incomplete profile -->
+                    {% if messages %}
+                    <div class="alert-container px-4 pt-4 pb-0">
+                        {% for message in messages %}
+                            {% if 'Please complete your profile' in message.message or 'Welcome! Please complete your profile' in message.message %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <!-- Profile completion progress -->
+                        <div class="progress mb-4" style="height: 10px;">
+                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="profileProgress" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                                                    <form method="post" id="profileForm" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Section: Personal Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary bg-opacity-10">
+                                    <h5 class="mb-0"><i class="fas fa-user me-2"></i> Personal Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3 mb-md-0">
+                                            <label for="{{ profile_form.first_name.id_for_label }}" class="form-label">First Name <span class="text-danger">*</span></label>
+                                            {{ profile_form.first_name }}
+                                            <div class="form-text">Required for your membership profile</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ profile_form.last_name.id_for_label }}" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                            {{ profile_form.last_name }}
+                                            <div class="form-text">Required for your membership profile</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ profile_form.email.id_for_label }}" class="form-label">Email <span class="text-danger">*</span></label>
+                                            {{ profile_form.email }}
+                                            <div class="form-text">Your primary contact email</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="id_phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                            <input type="tel" name="phone_number" value="{{ member.phone_number|default:'' }}" class="form-control" id="id_phone_number" required>
+                                            <div class="form-text">For important membership communications</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Preferences -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-info bg-opacity-10">
+                                    <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i> Preferences</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="{{ theme_form.theme_preference.id_for_label }}" class="form-label">Theme Preference</label>
+                                            {{ theme_form.theme_preference }}
+                                            <div class="form-text">Choose your preferred website theme.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Address Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-success bg-opacity-10">
+                                    <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i> Address Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 mb-3">
+                                            <label for="{{ address_form.street.id_for_label }}" class="form-label">Street Address <span class="text-danger">*</span></label>
+                                            {{ address_form.street }}
+                                            {% if address_form.street.errors %}
+                                            <div class="text-danger">
+                                                {{ address_form.street.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3 mb-md-0">
+                                            <label for="{{ address_form.city.id_for_label }}" class="form-label">City <span class="text-danger">*</span></label>
+                                            {{ address_form.city }}
+                                            {% if address_form.city.errors %}
+                                            <div class="text-danger">
+                                                {{ address_form.city.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ address_form.state.id_for_label }}" class="form-label">State <span class="text-danger">*</span></label>
+                                            {{ address_form.state }}
+                                            {% if address_form.state.errors %}
+                                            <div class="text-danger">
+                                                {{ address_form.state.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3 mb-md-0">
+                                            <label for="{{ address_form.zip_code.id_for_label }}" class="form-label">ZIP Code <span class="text-danger">*</span></label>
+                                            {{ address_form.zip_code }}
+                                            {% if address_form.zip_code.errors %}
+                                            <div class="text-danger">
+                                                {{ address_form.zip_code.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ address_form.country.id_for_label }}" class="form-label">Country <span class="text-danger">*</span></label>
+                                            {{ address_form.country }}
+                                            {% if address_form.country.errors %}
+                                            <div class="text-danger">
+                                                {{ address_form.country.errors }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form controls -->
+                            <div class="alert alert-light border mt-4 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    <small><span class="text-danger">*</span> Required fields must be completed to access all member features.</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                {% if member.user != request.user and user.is_superuser or user.groups.all.0.name == 'Member Manager' %}
+                                <a href="{% url 'members:member_detail' member.id %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to Member Details
+                                </a>
+                                {% else %}
+                                <a href="{% url 'members:member_profile' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to Profile
+                                </a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i> Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/profile-completion.js"></script>
+{% endblock %}

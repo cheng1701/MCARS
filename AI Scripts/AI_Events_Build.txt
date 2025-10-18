@@ -1,0 +1,21 @@
+create a new app called events
+
+create a new role called "Events Manager". activate that role with the role management screen in settings app.
+
+The events application is predominately a calendar. 
+
+it is a calendar open to the entire organization.  Make the calendar as functional as possible.
+
+Unit COs and the "Events Manager" can create, amend, change, or remove an event.
+
+A CO can delegate this responsibility to someone they assign to in their unit.
+If that member leaves the unit, the CO takes over again.
+
+The primary calendar can be filtered by the unit, sector, Quadrant, or by the whole fleet.
+When looking at sector, Quadrant, or HQ items, the user can show just the unit, or the unit's events and their subordinate's events all the way down.
+
+create a filtered calendar section on every unit's page reflecting their activities.
+This is for both the public, and editable unit profile pages.
+
+An event will include the name of the event, the people involved, location or teams meeting url,
+time and date. an optional image is available as well.  When an event is created, modified, or deleted, all attendees are notified by email.

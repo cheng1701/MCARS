@@ -1,0 +1,46 @@
+## AI Assistant
+
+
+
+## AI Assistant
+
+
+
+## AI Assistant
+
+
+
+## Me
+create a new application called rank.  make a new role called "rank_manager".  the rank Create a new application called Rank. Make a new role called "rank_manager." The rank_manager will oversee the library of military ranks. The first feature involves managing a rank. Each rank will have a unique identifier called paygrade, along with additional fields short_rank and long_rank. the paygrade needs to be ordered and sortable. Each paygrade will have themes based on genre and branches, which together will display the rank. Each theme will include a name and an image of the rank.  manager will manage the library of military ranks. when creating templates, create the templates to manage mulitple themes per genre and branch.
+
+a rank manager will be able to manage ranks, genre, branches, and the themes of images.  
+
+
+
+Create a new application called Units.  
+Create a new role "unit-manager".  A unit can be one of these specific entities: "Fleet Commander", "Headquarters", "Quadrant", "Ship", and "Shuttle", and this list must remain in that order to depict echelon hierarchy.  A "Fleet Commander" has one and only one Person.  The "Headquarters" will have a person in charge called a "Commander" or CO.  The Headquarters CO can create positions and assign members to those positions.  The Headquarters CO is already considered a filled position.  The "Quadrant", "Sector", "Ship", and "Shuttle" types operate the same way.  The portal page for every unit will have a name, a string called "hull number," address, phone number, CO, list of positioned personnel. Wherever the name of the unit is displayed, if a value is set for hull number, the hull number will follow the name and be surrounded by parentheses.   A Shuttle can be subordinate to a Ship or Sector.  The Ship can be subordinate to a Sector or Quadrant, the Sector will be part of a Quadrant, and a Quadrant will be subordinate to the HQ, the HQ will be subordinate to the Fleet Commander. Each unit profile page will display the CO's name unit and unit image of the unit above.  The "unit-manager" can assign members to a unit as "crewmembers", and the unit CO of that unit along with the unit-manager can assign that crewmember to a position or remain a crewmember.
+
+Remove the "Unit Manager" role.  Remove all references, code, and database tables associated with the application Unit.  We will start over.
+
+Create a role called "Unit Manager".
+
+Create an app called "Unit". The main entity in this app is the "unit".  Every unit will have an image, a commanding officer (aka. Commander, or CO), locating data, contact information, and a unit logo.  Every unit will have positions, with some having full departments containing positions.  Log every assignment change.
+
+Add this business logic: A unit can be one of these specific entities: "Fleet Commander", "Headquarters", "Quadrant", "Ship", and "Shuttle".  This entity list is ordered and must maintain that order.  The order is to be referenced as hierarchical.  To go up or down the organization is to traverse this list of entities, similar to an organizational tree.  Each item is a subordinate of the item up the entity list. 
+
+Add this business logic: The unit manager can assign anyone to any unit, except for the Fleet commander, which the unit manager can only change that one position.  Leaders in their respective units will have the ability to assign members to positions, but only the unit manager can assign members to the unit.  Please differentiate this.  
+
+With the exception of the fleet commander, anyone can apply or nominate a member for a Unit assignment. Anyone requesting this will be approved by the fleet commander or the unit manager. 
+
+Add this business logic: The Fleet Commander is a one-person unit to represent the head of the organization. The unit manager can change the individual assigned as Commander (or CO) of that unit.  
+
+Add this business logic: The Headquarters unit is subordinate to the Fleet Commander.  There will be only one Headquarters unit.  There will be a CO assigned, in which cannot be assigned anywhere else but the CO position.  There will be a XO position automatically, but may or may not be assigned by the CO from the list of members assigned to that unit.  The HQ CO may create departments, with department heads and the department heads or the CO or XO may create positions and fill them in the departments.  The CO of the Headquarters may also be as a CO of a another Ship or Shuttle. 
+
+Add this business logic: The Quadrant will be subordinate to the Headquarters unit.  There may be zero to many Quadrants to the Headquarters.  Each Quadrant will be assigned a Commanding officer (CO).  The unit manager will associate countries to a quadrant.  The CO of the Quadrant may also be as a CO of a another Ship or Shuttle. 
+
+Add this business logic: The Sector will be subordinate to the Headquarters unit.  There may be zero to many Sectors to the Quadrant.  Each Quadrant will be assigned a Commanding officer (CO).  The Sector will be difined and set to the number of States and/or provinces in countries under the assigned Quadrant on earth that fall into that quadrant.  
+
+Add this business logic: The ship will be subordinate to the Sector unit. If there are no Sector units available, it can be subordinate to ta Quadrant.  If there are no quadrants available, it can be subordinate to the HQ. There may be zero to many ships in this relationship.  Each ship will be assigned a Commanding officer (CO).  The member assigned as CO will be the position for that member.  The ship will also have an Executive Officer or (XO) as the second static position for this unit.  The default value for this position is vacant until the CO or the unit manager sets one.  The CO, XO, and the unit manager can create additional positions and fill them with available members.  The unit manager, or any CO in a unit higher than this one can assign members to the unit.  If any member assigned to the unit isnot in a position, it will default as a "crewmember"
+
+Add this business logic:  The shuttle is subordinate to the Ship.  It can be created by any CO within the current chain of command (parent Ship CO, Sector CO, or above COs).  The shuttle will be led not by a CO but by an "Officer in Charge" or OIC.  the OIC can operate like a ship CO. If the shuttle gains more than five members including the OIC, the OIC, Supervising Ship CO, Supervising Sector or Quadrant CO, Headquarters CO, or Fleet Commander may convert this shuttle to a ship and change the immediate supervisor to a Sector CO, Quadrant CO, HQ CO, or Fleet Commander.
+

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="id_default_paygrade" class="form-label">Default Paygrade:</label>
+                            {{ form.default_paygrade }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_default_branch" class="form-label">Default Branch:</label>
+                            {{ form.default_branch }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_default_genre" class="form-label">Default Genre:</label>
+                            {{ form.default_genre }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_default_theme" class="form-label">Default Theme:</label>
+                            {{ form.default_theme }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'rank:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Function to update themes based on selected genre and branch
+    function updateThemes() {
+        const genreId = $('#id_default_genre').val();
+        const branchId = $('#id_default_branch').val();
+
+        $.ajax({
+            url: '{% url "rank:get_themes_ajax" %}',
+            data: {
+                'genre_id': genreId,
+                'branch_id': branchId
+            },
+            dataType: 'json',
+            success: function(data) {
+                const themeSelect = $('#id_default_theme');
+                themeSelect.empty();
+
+                // Add empty option
+                themeSelect.append($('<option></option>').attr('value', '').text('---------'));
+
+                // Add themes from response
+                $.each(data.themes, function(index, theme) {
+                    themeSelect.append($('<option></option>').attr('value', theme.id).text(theme.name));
+                });
+            }
+        });
+    }
+
+    // Set up change event handlers
+    $('#id_default_genre, #id_default_branch').change(updateThemes);
+});
+</script>
+{% endblock %}
+{% endblock %}

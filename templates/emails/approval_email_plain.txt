@@ -1,0 +1,49 @@
+Your Membership is Approved!
+Your Membership is Approved!
+
+Dear {{ user.first_name }} {{ user.last_name }},
+
+We are pleased to inform you that your membership application has been approved! Welcome to the Membership Club family.
+
+Membership Details:
+- Membership Type: {{ member.membership_type.name }}
+- Membership ID: {{ member.membership_id }}
+- Approval Date: {{ member.approval_date|date:"F j, Y" }}
+{% if member.expiration_date %}
+- Expiration Date: {{ member.expiration_date|date:"F j, Y" }}
+{% endif %}
+
+You can now log in to your member dashboard to access all member benefits and features.
+
+Access your dashboard at: http://{{ request.get_host }}{% url 'members:member_dashboard' %}
+
+If you have any questions about your membership, please don't hesitate to contact us.
+
+Best regards,
+The Membership Club Team
+
+© {% now "Y" %} Membership Club. All rights reserved.
+123 Club Street, City, State
+Dear {{ user.first_name }} {{ user.last_name }},
+
+We are pleased to inform you that your membership application has been approved! Welcome to the Membership Club family.
+
+Membership Details:
+- Membership Type: {{ member.membership_type.name }}
+- Membership ID: {{ member.membership_id }}
+- Approval Date: {{ member.approval_date|date:"F j, Y" }}
+{% if member.expiration_date %}
+- Expiration Date: {{ member.expiration_date|date:"F j, Y" }}
+{% endif %}
+
+You can now log in to your member dashboard to access all member benefits and features.
+
+Access your dashboard at: http://{{ request.get_host }}{% url 'members:member_dashboard' %}
+
+If you have any questions about your membership, please don't hesitate to contact us.
+
+Best regards,
+The Membership Club Team
+
+© {% now "Y" %} Membership Club. All rights reserved.
+123 Club Street, City, State

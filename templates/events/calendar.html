@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load events_tags %}
+{% block title %}Events Calendar{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h3 mb-0">Events Calendar</h1>
+      {% events_manage_eligible as can_events_manage %}
+      {% if can_events_manage %}
+      <a href="{% url 'events:event_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> New Event</a>
+      {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="card mb-3">
+      <div class="card-body row g-2 align-items-end">
+        <div class="col-md-2">
+          <label class="form-label">Scope</label>
+          <select name="scope" class="form-select">
+            <option value="fleet" {% if selected_scope == 'fleet' %}selected{% endif %}>Fleet</option>
+            <option value="quadrant" {% if selected_scope == 'quadrant' %}selected{% endif %}>Quadrant</option>
+            <option value="sector" {% if selected_scope == 'sector' %}selected{% endif %}>Sector</option>
+            <option value="unit" {% if selected_scope == 'unit' %}selected{% endif %}>Unit</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Unit</label>
+          <select name="unit" class="form-select">
+            <option value="">-- Any --</option>
+            {% for u in units %}
+            <option value="{{ u.id }}" {% if selected_unit and selected_unit.id == u.id %}selected{% endif %}>{{ u.get_display_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 form-check mt-4">
+          <input type="checkbox" class="form-check-input" id="include_sub" name="include_sub" value="1" {% if include_sub %}checked{% endif %}>
+          <label for="include_sub" class="form-check-label">Include Subordinates</label>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Start Date</label>
+          <input type="date" name="from" value="{{ from_value }}" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">End Date</label>
+          <input type="date" name="to" value="{{ to_value }}" class="form-control">
+        </div>
+        <!-- Maintain month in filters -->
+        <input type="hidden" name="y" value="{{ year }}">
+        <input type="hidden" name="m" value="{{ month_name|date:'n' }}">
+        <div class="col-12 text-end mt-2">
+          <button class="btn btn-outline-secondary">Apply Filters</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Month navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <a class="btn btn-outline-secondary btn-sm" href="?scope={{ selected_scope }}{% if selected_unit %}&unit={{ selected_unit.id }}{% endif %}{% if include_sub %}&include_sub=1{% endif %}{% if from_value %}&from={{ from_value }}{% endif %}{% if to_value %}&to={{ to_value }}{% endif %}&y={{ prev_y }}&m={{ prev_m }}">
+        <i class="fas fa-chevron-left"></i> Prev
+      </a>
+      <h3 class="mb-0">{{ month_name }} {{ year }}</h3>
+      <a class="btn btn-outline-secondary btn-sm" href="?scope={{ selected_scope }}{% if selected_unit %}&unit={{ selected_unit.id }}{% endif %}{% if include_sub %}&include_sub=1{% endif %}{% if from_value %}&from={{ from_value }}{% endif %}{% if to_value %}&to={{ to_value }}{% endif %}&y={{ next_y }}&m={{ next_m }}">
+        Next <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="card shadow-sm">
+      <div class="card-body p-2">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle mb-0 calendar-table">
+            <thead class="table-light">
+              <tr class="text-center small">
+                <th style="width:14.28%">Sun</th>
+                <th style="width:14.28%">Mon</th>
+                <th style="width:14.28%">Tue</th>
+                <th style="width:14.28%">Wed</th>
+                <th style="width:14.28%">Thu</th>
+                <th style="width:14.28%">Fri</th>
+                <th style="width:14.28%">Sat</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for week in weeks %}
+              <tr style="height:120px">
+                {% for cell in week %}
+                  <td class="align-top">
+                    {% if cell.date %}
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold small">{{ cell.date.day }}</span>
+                      </div>
+                      {% if cell.events %}
+                        <div class="d-grid gap-1">
+                          {% for e in cell.events|slice:':4' %}
+                            <a href="{% url 'events:event_detail' e.id %}" class="badge text-bg-primary text-start w-100" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                              {{ e.title }}
+                            </a>
+                          {% endfor %}
+                          {% if cell.events|length > 4 %}
+                            <a href="{% url 'events:calendar' %}?from={{ cell.date|date:'Y-m-d' }}&to={{ cell.date|date:'Y-m-d' }}" class="badge text-bg-secondary w-100">+{{ cell.events|length|add:'-4' }} more</a>
+                          {% endif %}
+                        </div>
+                      {% else %}
+                        <div class="text-muted small">&nbsp;</div>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional list view below calendar for details -->
+    <div class="card mt-3">
+      <div class="card-header">Upcoming Events</div>
+      <div class="card-body">
+        {% if events %}
+        <ul class="list-unstyled mb-0">
+          {% for e in events %}
+          <li class="mb-2">
+            <a class="fw-bold text-decoration-none" href="{% url 'events:event_detail' e.id %}">{{ e.title }}</a>
+            <div class="small text-muted">
+              {{ e.start_datetime|date:'M d, Y H:i' }} – {{ e.end_datetime|date:'M d, Y H:i' }}{% if e.unit %} • {{ e.unit.get_display_name }}{% endif %}{% if e.host %} • Host: {{ e.host.get_ranked_name|default:e.host.user.get_full_name }}{% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted mb-0">No events match your filters.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% block extra_css %}
+<style>
+  .calendar-table td { min-width: 120px; }
+  @media (max-width: 768px) {
+    .calendar-table td { min-width: auto; }
+  }
+</style>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4 mb-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Rank Manager Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'rank:dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        </a>
+
+                        <!-- Rank Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-medal me-2"></i> Rank Management</strong>
+                        </div>
+                        <a href="{% url 'rank:rank_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-list me-2"></i> All Ranks
+                        </a>
+                        <a href="{% url 'rank:rank_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus me-2"></i> Add New Rank
+                        </a>
+
+                        <!-- Theme Management Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-palette me-2"></i> Theme Management</strong>
+                        </div>
+                        <a href="{% url 'rank:theme_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-images me-2"></i> All Themes
+                        </a>
+                        <a href="{% url 'rank:theme_create' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle me-2"></i> Create Theme
+                        </a>
+
+                        <!-- Configuration Section -->
+                        <div class="list-group-item list-group-item-secondary">
+                            <strong><i class="fas fa-cogs me-2"></i> Configuration</strong>
+                        </div>
+                        <a href="{% url 'rank:genre_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tags me-2"></i> Manage Genres
+                        </a>
+                        <a href="{% url 'rank:branch_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-code-branch me-2"></i> Manage Branches
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'rank:dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'rank:rank_list' %}">Ranks</a></li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">{{ title }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="{{ form.paygrade.id_for_label }}" class="form-label">Paygrade</label>
+                                {{ form.paygrade }}
+                                {% if form.paygrade.errors %}
+                                <div class="text-danger">
+                                    {{ form.paygrade.errors }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Format: X-Y (e.g., E-1, O-3)</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.short_name.id_for_label }}" class="form-label">Short Name</label>
+                                {{ form.short_name }}
+                                {% if form.short_name.errors %}
+                                <div class="text-danger">
+                                    {{ form.short_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.long_name.id_for_label }}" class="form-label">Long Name</label>
+                                {{ form.long_name }}
+                                {% if form.long_name.errors %}
+                                <div class="text-danger">
+                                    {{ form.long_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'rank:rank_list' %}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

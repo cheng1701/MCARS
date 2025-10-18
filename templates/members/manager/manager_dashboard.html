@@ -1,0 +1,15 @@
+                <div class="list-group mb-4">
+                    <div class="list-group-item bg-light"><strong>Member Management</strong></div>
+                    <a href="{% url 'members:pending_approvals' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        Pending Approvals
+                        {% if pending_approvals_count %}
+                            <span class="badge bg-danger rounded-pill">{{ pending_approvals_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'members:member_list' %}" class="list-group-item list-group-item-action">Member Directory</a>
+                </div>
+
+                <div class="list-group mb-4">
+                    <div class="list-group-item bg-light"><strong>Content Management</strong></div>
+                    <a href="{% url 'members:faq_management' %}" class="list-group-item list-group-item-action">FAQ Management</a>
+                </div>

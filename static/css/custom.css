@@ -1,0 +1,36 @@
+/* Custom styles */
+
+/* Member avatar styles */
+.member-avatar {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+/* Table style improvements */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.member-link {
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.member-link:hover {
+    color: #007bff;
+    text-decoration: underline;
+}

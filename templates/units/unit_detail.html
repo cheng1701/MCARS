@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load events_tags %}
+{% block title %}{{ unit.get_display_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'units:unit_list' %}">Units</a></li>
+            <li class="breadcrumb-item active">{{ unit.get_display_name }}</li>
+          </ol>
+        </nav>
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <h1 class="mb-3">{{ unit.get_display_name }}</h1>
+                <p class="text-muted mb-2">{{ unit.get_type_display }}</p>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    {% if unit.street_address %}
+                    <p class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>{{ unit.street_address }}<br>{{ unit.city }}{% if unit.state %}, {{ unit.state }}{% endif %} {{ unit.zip_code }}</p>
+                    {% endif %}
+                    {% if unit.phone_number %}
+                    <p class="mb-2"><i class="fas fa-phone me-2"></i>{{ unit.phone_number }}</p>
+                    {% endif %}
+                    {% if unit.email %}
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i><a href="mailto:{{ unit.email }}">{{ unit.email }}</a></p>
+                    {% endif %}
+                  </div>
+                  <div class="col-md-6">
+                    {% if unit.parent %}
+                    <p class="mb-2"><i class="fas fa-arrow-up me-2"></i>Subordinate to: <a href="{% url 'units:unit_detail' unit.parent_id %}">{{ unit.parent.get_display_name }}</a></p>
+                    {% endif %}
+                    {% if unit.commanding_officer %}
+                    <p class="mb-2"><i class="fas fa-user-astronaut me-2"></i> CO: <a href="{% url 'members:member_detail' unit.commanding_officer.id %}" class="text-primary fw-bold text-decoration-none">{{ unit.commanding_officer.get_ranked_name|default:unit.commanding_officer.user.get_full_name }}</a></p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex justify-content-end align-items-center gap-2">
+                  {% if unit.image %}
+                    <img src="{{ unit.image.url }}" class="rounded" alt="{{ unit.get_display_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                  {% endif %}
+                  {% if unit.parent and unit.parent.image %}
+                    <a href="{% url 'units:unit_detail' unit.parent_id %}" title="View {{ unit.parent.get_display_name }}">
+                      <img src="{{ unit.parent.image.url }}" class="rounded border" alt="{{ unit.parent.get_display_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Senior Staff</h4>
+            {% if user.is_authenticated %}
+            {% if user.is_staff or user.is_superuser or user.groups.all.0.name == 'unit_manager' or unit.commanding_officer and unit.commanding_officer.user_id == user.id %}
+            <div class="btn-group btn-group-sm">
+              {% if unit.type == 'FLEET_COMMANDER' %}
+                <a href="{% url 'units:change_commander' unit.pk %}" class="btn btn-light btn-sm"><i class="fas fa-user-astronaut"></i> Change Commander</a>
+                <a href="{% url 'units:add_member' unit.pk %}" class="btn btn-light btn-sm"><i class="fas fa-user-plus"></i> Add Special Staff</a>
+              {% else %}
+                <a href="{% url 'units:add_member' unit.pk %}" class="btn btn-light btn-sm"><i class="fas fa-user-plus"></i> Add Member</a>
+              {% endif %}
+              <a href="{% url 'units:manage_positions' unit.pk %}" class="btn btn-light btn-sm"><i class="fas fa-tools"></i> Manage Positions</a>
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if unit.co_membership %}
+            <div class="d-flex align-items-center mb-2">
+              {% if unit.commanding_officer.profile_image %}
+              <img src="{{ unit.commanding_officer.profile_image.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="CO">
+              {% endif %}
+              <div class="flex-grow-1">
+                <small class="fw-bold"><a href="{% url 'members:member_detail' unit.commanding_officer.id %}" class="text-primary fw-bold text-decoration-none">{{ unit.commanding_officer.get_ranked_name|default:unit.commanding_officer.user.get_full_name }}</a></small>
+                <br><small class="text-muted">{{ unit.co_membership.position_name }}</small>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if positioned_members %}
+              {% for membership in positioned_members %}
+              <div class="d-flex align-items-center mb-2">
+                {% if membership.member.profile_image %}
+                <img src="{{ membership.member.profile_image.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="Member">
+                {% endif %}
+                <div class="flex-grow-1">
+                  <small class="fw-bold"><a href="{% url 'members:member_detail' membership.member.id %}" class="text-primary fw-bold text-decoration-none">{{ membership.member.get_ranked_name|default:membership.member.user.get_full_name }}</a></small>
+                  <br><small class="text-muted">{{ membership.position.name }}</small>
+                </div>
+                {% if user.is_authenticated %}
+                {% if user.is_staff or user.groups.all.0.name == 'unit_manager' or unit.commanding_officer and unit.commanding_officer.user_id == user.id %}
+                <a href="{% url 'units:assign_position' unit.pk membership.id %}" class="btn btn-sm btn-outline-primary">Assign Position</a>
+                {% endif %}
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted">No senior staff yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if unit.type == 'HEADQUARTERS' %}
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Departments</h4>
+            {% if user.is_authenticated %}
+            <a href="{% url 'units:manage_departments' unit.pk %}" class="btn btn-light btn-sm">
+              <i class="fas fa-sitemap me-1"></i> Manage Departments
+            </a>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if unit.departments.count %}
+              <div class="row">
+                {% for d in unit.departments.all %}
+                <div class="col-md-6 mb-3">
+                  <div class="border rounded p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <h5 class="mb-0">{{ d.name }}</h5>
+                      {% if user.is_authenticated %}
+                      <a href="{% url 'units:manage_department' unit.pk d.pk %}" class="btn btn-sm btn-outline-primary">Manage</a>
+                      {% endif %}
+                    </div>
+                    {% if d.description %}<p class="text-muted small mb-2">{{ d.description }}</p>{% endif %}
+                    <p class="mb-1"><strong>Leader:</strong>
+                      {% if d.leader %}
+                        {% if d.leader.profile_image %}
+                          <img src="{{ d.leader.profile_image.url }}" alt="{{ d.leader.user.get_full_name }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% endif %}
+                        <a href="{% url 'members:member_detail' d.leader.id %}" class="text-primary fw-bold text-decoration-none">{{ d.leader.get_ranked_name|default:d.leader.user.get_full_name }}</a>
+                      {% else %}
+                        <span class="text-muted">Vacant</span>
+                      {% endif %}
+                    </p>
+                    <p class="mb-1"><strong>Staff:</strong>
+                      {% with staff=d.memberships.all %}
+                        {% if staff %}
+                          {% for m in staff %}
+                            {% if m.member.profile_image %}
+                              <img src="{{ m.member.profile_image.url }}" alt="{{ m.member.user.get_full_name }}" class="rounded-circle me-1" style="width: 30px; height: 30px; object-fit: cover; vertical-align: middle;">
+                            {% endif %}
+                            <a href="{% url 'members:member_detail' m.member.id %}" class="text-decoration-none align-middle">{{ m.member.get_ranked_name|default:m.member.user.get_full_name }}</a>{% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                        {% else %}
+                          <span class="text-muted">None</span>
+                        {% endif %}
+                      {% endwith %}
+                    </p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+                <div class="alert alert-info mb-0">No departments created yet.</div>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-info mb-0">No departments created yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Subordinate Units Section -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Subordinate Units</h4>
+          </div>
+          <div class="card-body">
+            {% with subs=unit.children.all %}
+              {% if subs %}
+              <div class="row">
+                {% for su in subs %}
+                <div class="col-md-6 mb-3">
+                  <div class="d-flex align-items-center">
+                    {% if su.image %}
+                    <a href="{% url 'units:unit_detail' su.pk %}">
+                      <img src="{{ su.image.url }}" class="rounded me-3" alt="{{ su.get_display_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                    </a>
+                    {% endif %}
+                    <div>
+                      <h5 class="mb-1"><a href="{% url 'units:unit_detail' su.pk %}" class="text-decoration-none">{{ su.get_display_name }}</a></h5>
+                      <div class="text-muted small mb-1">{{ su.get_type_display }}</div>
+                      {% if su.city %}
+                      <div class="mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ su.city }}{% if su.state %}, {{ su.state }}{% endif %}{% if su.country %}, {{ su.country }}{% endif %}</div>
+                      {% endif %}
+                      {% if su.commanding_officer %}
+                      <div><i class="fas fa-user-astronaut me-1"></i> CO: <a href="{% url 'members:member_detail' su.commanding_officer.id %}" class="text-primary fw-bold text-decoration-none">{{ su.commanding_officer.get_ranked_name|default:su.commanding_officer.user.get_full_name }}</a></div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+                <p class="text-muted mb-0">No subordinate units.</p>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Unpositioned Crewmembers Section #}
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Unpositioned Crewmembers</h4>
+            {% if user.is_authenticated %}
+            {% if user.is_staff or user.is_superuser or user.groups.all.0.name == 'unit_manager' or unit.commanding_officer and unit.commanding_officer.user_id == user.id %}
+            <a href="{% url 'units:manage_positions' unit.pk %}" class="btn btn-light btn-sm">
+              <i class="fas fa-tools me-1"></i> Manage Positions
+            </a>
+            {% endif %}
+            {% endif %}
+          </div>
+          <div class="card-body">
+            {% if unpositioned_members %}
+              {% for membership in unpositioned_members %}
+              <div class="d-flex align-items-center mb-2">
+                {% if membership.member.profile_image %}
+                <img src="{{ membership.member.profile_image.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" alt="Member">
+                {% endif %}
+                <div class="flex-grow-1">
+                  <small class="fw-bold"><a href="{% url 'members:member_detail' membership.member.id %}" class="text-primary fw-bold text-decoration-none">{{ membership.member.get_ranked_name|default:membership.member.user.get_full_name }}</a></small>
+                  <br><small class="text-muted">Crewmember</small>
+                </div>
+                {% if user.is_authenticated %}
+                {% if user.is_staff or user.groups.all.0.name == 'unit_manager' or unit.commanding_officer and unit.commanding_officer.user_id == user.id %}
+                <a href="{% url 'units:assign_position' unit.pk membership.id %}" class="btn btn-sm btn-outline-primary">Assign Position</a>
+                {% endif %}
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted mb-0">No unpositioned crewmembers.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% upcoming_events_for_unit unit True 5 %}
+</section>
+{% endblock %}

@@ -1,0 +1,226 @@
+/* Light Theme CSS */
+body {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Card backgrounds */
+.card {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+}
+
+.card-header:not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info) {
+    background-color: #f8f9fa;
+    color: #333333;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top-color: #dee2e6;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #ffffff !important;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #333333;
+}
+
+.navbar-light .navbar-brand {
+    color: #212529;
+}
+
+/* Light backgrounds */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+/* Form controls */
+.form-control, .form-select {
+    background-color: #ffffff;
+    border-color: #ced4da;
+    color: #212529;
+}
+
+.input-group-text {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    color: #212529;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #ffffff;
+    color: #212529;
+    border-color: #86b7fe;
+}
+
+/* Table styling */
+.table {
+    color: #212529;
+}
+
+.table-bordered {
+    border-color: #dee2e6;
+}
+
+.table-bordered td, .table-bordered th {
+    border-color: #dee2e6;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+}
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: #f8f9fa;
+}
+
+.breadcrumb-item a {
+    color: #0d6efd;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+/* Plan cards */
+.plan-card {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+}
+
+.plan-header {
+    background-color: #f8f9fa;
+}
+
+/* Accordion styling */
+.accordion-item {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+}
+
+.accordion-button {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #212529;
+    background-color: #e7f1ff;
+}
+
+.accordion-button:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.accordion-body {
+    background-color: #ffffff;
+    color: #212529;
+}
+
+/* Links */
+a:not(.btn) {
+    color: #0d6efd;
+}
+
+a:hover:not(.btn) {
+    color: #0a58ca;
+}
+
+/* Text colors */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Modal backgrounds */
+.modal-content {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom-color: #dee2e6;
+}
+
+.modal-footer {
+    border-top-color: #dee2e6;
+}
+
+/* List groups */
+.list-group-item {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.125);
+    color: #212529;
+}
+
+/* Team cards */
+.team-member {
+    background-color: #ffffff;
+}
+
+/* Hero sections */
+.hero-section {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* Shadows */
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    color: #212529;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #f8f9fa;
+    color: #1e2125;
+}
+
+.dropdown-divider {
+    border-top-color: #e9ecef;
+}
+
+
+/* Ensure top menu visibility on light theme */
+/* Override global white nav-link text from styles.css when navbar is light */
+.navbar-light .navbar-nav .nav-link,
+.navbar .navbar-nav .nav-link,
+.navbar-light .navbar-brand,
+.navbar .navbar-brand,
+.navbar-light .dropdown-toggle,
+.navbar .dropdown-toggle,
+.navbar-light .btn.nav-link,
+.navbar .btn.nav-link {
+    color: #212529 !important; /* dark text on white background */
+}
+
+.navbar-light .nav-link:hover,
+.navbar .nav-link:hover,
+.navbar-light .navbar-brand:hover {
+    color: #000000 !important;
+}
+
+/* Ensure the navbar toggler is visible in light mode */
+.navbar-light .navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+.navbar-light .navbar-toggler-icon {
+    filter: invert(0); /* keep dark icon for light bg */
+}

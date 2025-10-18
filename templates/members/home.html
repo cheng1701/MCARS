@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Membership Club - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1>Welcome to the Federation's MCARs Portal</h1>
+        <p>Join our community of members to access exclusive benefits, events, and services.</p>
+        <a href="{% url 'members:register' %}" class="btn btn-warning btn-lg">Become a Member</a>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Why Join Our Membership?</h2>
+            <p class="lead">Discover the benefits of becoming a member today</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-shield text-white fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Exclusive Access</h4>
+                        <p class="text-muted">Gain access to members-only areas and special events throughout the year.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-danger d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-tags text-white fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Member Discounts</h4>
+                        <p class="text-muted">Enjoy special pricing and exclusive offers only available to our members.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                            <i class="fas fa-users text-dark fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Community</h4>
+                        <p class="text-muted">Connect with like-minded individuals and build lasting relationships.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Membership Plans Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Membership Plans</h2>
+            <p class="lead">We offer a variety of membership options to fit your needs</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <p class="mb-4">Explore our range of membership plans, from free trials to lifetime memberships. We have options for individuals and families with exclusive benefits for each tier.</p>
+                <a href="{% url 'members:membership_plans' %}" class="btn btn-primary btn-lg">View All Membership Plans</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">What Our Members Say</h2>
+            <p class="lead">Hear from our satisfied members</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="fst-italic">"Joining this membership club has been one of the best decisions I've made. The benefits and community are wonderful!"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <span class="text-white fw-bold">JD</span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">John Doe</h5>
+                                <small class="text-muted">Member since 2022</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="fst-italic">"The family membership plan is perfect for us. My kids love being part of the club activities and events."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="rounded-circle bg-danger d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <span class="text-white fw-bold">JS</span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Jane Smith</h5>
+                                <small class="text-muted">Family Member</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                        <p class="fst-italic">"The lifetime membership was a great investment. I've already saved money with the exclusive discounts and benefits."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <span class="text-dark fw-bold">RJ</span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Robert Johnson</h5>
+                                <small class="text-muted">Lifetime Member</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Ready to Join Our Community?</h2>
+        <p class="lead mb-4">Become a member today and start enjoying all the benefits!</p>
+        <a href="{% url 'members:register' %}" class="btn btn-warning btn-lg">Join Now</a>
+    </div>
+</section>
+{% endblock %}

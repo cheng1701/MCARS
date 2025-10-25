@@ -3,9 +3,9 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="b5931fec-1a35-4065-9019-a2641318a5b4" name="MCARS server" url="http://ift-mcars.org">
-        <fileTransfer host="ift-mcars.org" port="21">
+        <fileTransfer rootFolder="/home/ubuntu/MCARS_TEST" accessType="SFTP" host="ec2-18-117-96-42.us-east-2.compute.amazonaws.com" port="22" sshConfigId="70538628-7fb0-4494-9265-72b1d815cca1" sshConfig="ubuntu@ec2-18-117-96-42.us-east-2.compute.amazonaws.com:22 key" keyPair="true">
           <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
         </fileTransfer>
       </webServer>

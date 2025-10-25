@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="ec2-18-117-96-42.us-east-2.compute.amazonaws.com" id="70538628-7fb0-4494-9265-72b1d815cca1" keyPath="$USER_HOME$/.ssh/MCARS.pem" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

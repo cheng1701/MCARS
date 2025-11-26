@@ -14,21 +14,27 @@ from pathlib import Path
 import os
 
 from django.contrib import staticfiles
+from dotenv import load_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env at the project root
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=$((a+*wuv4ph)=3#fc%*g@*wdjxta2jt%#ru^@i#&g!76438f'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-=$((a+*wuv4ph)=3#fc%*g@*wdjxta2jt%#ru^@i#&g!76438f')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = []
+# Comma-separated list in .env, e.g. "localhost,127.0.0.1"
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 
 # Application definition
@@ -88,8 +94,13 @@ WSGI_APPLICATION = 'MCARS.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# If DATABASE_URL is set (e.g., postgres://...), use it; otherwise fall back to SQLite
 DATABASES = {
-    'default': {
+    'default': dj_database_url.parse(
+        os.getenv('DATABASE_URL', ''),
+        conn_max_age=600,
+        ssl_require=False,
+    ) if os.getenv('DATABASE_URL') else {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -145,27 +156,25 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-# Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+# Email Configuration (env-driven with sensible defaults)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes', 'on')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
-# For production, use SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.yourmailserver.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your_email@example.com'
-# EMAIL_HOST_PASSWORD = 'your_password'
-# DEFAULT_FROM_EMAIL = 'Your Organization <info@yourorganization.com>'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication settings
 LOGIN_REDIRECT_URL = '/member/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Configure throttling and blocking
-FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
-BLOCKED_EMAILS_CACHE_TTL = 86400  # 24 hours in seconds
-BLOCKED_IPS_CACHE_TTL = 86400  # 24 hours in seconds
+# Configure throttling and blocking (env-driven)
+FAILED_LOGIN_ATTEMPTS_ALLOWED = int(os.getenv('FAILED_LOGIN_ATTEMPTS_ALLOWED', '5'))
+BLOCKED_EMAILS_CACHE_TTL = int(os.getenv('BLOCKED_EMAILS_CACHE_TTL', '86400'))  # 24 hours in seconds
+BLOCKED_IPS_CACHE_TTL = int(os.getenv('BLOCKED_IPS_CACHE_TTL', '86400'))  # 24 hours in seconds
 
 # Rank system defaults
 # These will be used if no settings are found in the database

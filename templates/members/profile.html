@@ -193,11 +193,23 @@
                                     </address>
                                 </div>
                                 <div class="col-md-6">
-                                    <div id="map" class="border" style="height: 150px; background-color: #e9ecef;">
-                                        <div class="d-flex align-items-center justify-content-center h-100">
-                                            <p class="mb-0 text-muted">Map placeholder</p>
-                                        </div>
+                                    {% with full_address=member.address.street|add:", "|add:member.address.city|add:", "|add:member.address.state|add:" "|add:member.address.zip_code|add:", "|add:member.address.country %}
+                                    <div id="map" class="border rounded overflow-hidden" style="height: 150px;">
+                                        <iframe
+                                            title="Map for {{ full_address }}"
+                                            width="100%"
+                                            height="100%"
+                                            frameborder="0"
+                                            style="border:0;"
+                                            referrerpolicy="no-referrer-when-downgrade"
+                                            src="https://www.google.com/maps?q={{ full_address|urlencode }}&output=embed"
+                                            allowfullscreen>
+                                        </iframe>
                                     </div>
+                                    <div class="mt-2 small text-end">
+                                        <a href="https://maps.google.com/?q={{ full_address|urlencode }}" target="_blank" rel="noopener">Open in Google Maps</a>
+                                    </div>
+                                    {% endwith %}
                                 </div>
                             </div>
                             {% else %}
@@ -208,7 +220,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </section>
 
 <!-- Profile Image Modal -->

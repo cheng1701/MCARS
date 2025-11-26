@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}About Us - Membership Club{% endblock %}
 
@@ -12,7 +13,7 @@
                 <p>Established in 2010, we've been bringing people together through shared interests and opportunities for over a decade.</p>
             </div>
             <div class="col-lg-6">
-                <img src="https://via.placeholder.com/600x400" alt="About Membership Club" class="img-fluid rounded shadow">
+                <img src="{% static 'img/registration_background.png' %}" alt="About Membership Club" class="img-fluid rounded shadow">
             </div>
         </div>
     </div>

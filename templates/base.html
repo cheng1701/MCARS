@@ -111,7 +111,7 @@
                                     <li><a class="dropdown-item" href="{% url 'settings:dashboard' %}"><i class="fas fa-sliders-h me-1"></i> Settings Dashboard</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                 {% endif %}
-                                {% events_manage_eligible as can_events_manage %}
+                                {% events_manage_eligible event request.user as can_events_manage %}
                                 {% if can_events_manage %}
                                     <li><a class="dropdown-item" href="{% url 'events:calendar' %}"><i class="fas fa-calendar-alt me-1"></i> Events Dashboard</a></li>
                                     <li><hr class="dropdown-divider"></li>
